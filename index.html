@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة تكلفة المواد</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; direction: rtl; }
+.app { max-width: 960px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; font-size: 28px; padding: 24px 0; color: #38bdf8; border-bottom: 2px solid #1e293b; margin-bottom: 24px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.tab { padding: 10px 20px; background: #1e293b; border: 2px solid #334155; border-radius: 10px; color: #94a3b8; cursor: pointer; font-size: 15px; font-family: inherit; transition: all 0.2s; }
+.tab:hover { border-color: #38bdf8; color: #38bdf8; }
+.tab.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: bold; }
+.card { background: #1e293b; border-radius: 14px; padding: 24px; margin-bottom: 20px; border: 1px solid #334155; }
+.card h2 { font-size: 20px; margin-bottom: 16px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 14px; color: #94a3b8; }
+input, select, textarea { padding: 12px 14px; background: #0f172a; border: 2px solid #334155; border-radius: 10px; color: #e2e8f0; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+textarea { resize: vertical; min-height: 60px; }
+input:focus, select:focus, textarea:focus { border-color: #38bdf8; }
+select { cursor: pointer; }
+option { background: #0f172a; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 15px; font-family: inherit; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: #38bdf8; color: #0f172a; }
+.btn-primary:hover { background: #7dd3fc; }
+.btn-success { background: #22c55e; color: #fff; }
+.btn-success:hover { background: #4ade80; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #f87171; }
+.btn-warning { background: #f59e0b; color: #0f172a; }
+.btn-warning:hover { background: #fbbf24; }
+.btn-secondary { background: #475569; color: #e2e8f0; }
+.btn-secondary:hover { background: #64748b; }
+.btn-sm { padding: 6px 14px; font-size: 13px; border-radius: 8px; }
+.material-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #0f172a; border-radius: 10px; margin-bottom: 8px; border: 1px solid #334155; transition: border-color 0.2s; gap: 12px; }
+.material-item:hover { border-color: #475569; }
+.material-img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 2px solid #334155; flex-shrink: 0; }
+.material-img-placeholder { width: 52px; height: 52px; border-radius: 10px; border: 2px dashed #475569; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 22px; flex-shrink: 0; }
+.material-info { flex: 1; min-width: 0; }
+.material-name { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+.material-details { font-size: 13px; color: #64748b; margin-top: 4px; }
+.material-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.material-item-clickable { cursor: pointer; }
+.img-upload-area { border: 2px dashed #475569; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.img-upload-area:hover { border-color: #38bdf8; }
+.img-upload-area img { max-width: 100%; max-height: 120px; border-radius: 8px; object-fit: contain; }
+.img-upload-area .upload-text { color: #64748b; font-size: 14px; }
+.img-remove-btn { display: inline-block; margin-top: 8px; padding: 4px 12px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit; }
+.toggle-section { background: #0f172a; border: 2px solid #334155; border-radius: 12px; margin-top: 16px; overflow: hidden; transition: border-color 0.3s; }
+.toggle-section.active { border-color: #38bdf8; }
+.toggle-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
+.toggle-header-right { display: flex; align-items: center; gap: 10px; }
+.toggle-icon { font-size: 20px; }
+.toggle-title { font-size: 16px; font-weight: 600; color: #e2e8f0; }
+.toggle-subtitle { font-size: 12px; color: #64748b; }
+.switch { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #475569; border-radius: 26px; cursor: pointer; transition: background 0.3s; }
+.slider::before { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform 0.3s; }
+.switch input:checked + .slider { background: #38bdf8; }
+.switch input:checked + .slider::before { transform: translateX(22px); }
+.toggle-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 18px; }
+.toggle-body.open { max-height: 600px; padding: 0 18px 16px; }
+.pkg-check-list { display: flex; flex-direction: column; gap: 8px; }
+.pkg-check-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #1e293b; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.pkg-check-item:hover { background: #334155; }
+.pkg-check-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; }
+.pkg-check-item .pkg-name { flex: 1; font-size: 14px; color: #e2e8f0; }
+.pkg-check-item .pkg-price { font-size: 13px; color: #38bdf8; font-weight: 600; }
+.result-box { background: linear-gradient(135deg, #065f46, #064e3b); border: 2px solid #22c55e; border-radius: 14px; padding: 24px; margin-top: 16px; display: none; }
+.result-box.show { display: block; }
+.result-breakdown { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; color: #86efac; }
+.result-row.sub { color: #6ee7b7; font-size: 13px; padding-right: 16px; }
+.result-divider { border-top: 1px dashed #22c55e; margin: 4px 0; }
+.result-total { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
+.result-total-label { font-size: 18px; color: #86efac; font-weight: 600; }
+.result-total-value { font-size: 32px; font-weight: bold; color: #fff; }
+.result-total-unit { font-size: 16px; color: #86efac; }
+.empty-state { text-align: center; padding: 40px; color: #475569; font-size: 16px; }
+.supplier-modal-content { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.supplier-modal-content .supplier-img { width: 100px; height: 100px; border-radius: 14px; object-fit: cover; border: 3px solid #334155; }
+.supplier-modal-content .supplier-img-placeholder { width: 100px; height: 100px; border-radius: 14px; border: 3px dashed #475569; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 40px; }
+.supplier-info-grid { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.supplier-info-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #0f172a; border-radius: 10px; border: 1px solid #334155; }
+.supplier-info-row .info-icon { font-size: 20px; flex-shrink: 0; }
+.supplier-info-row .info-content { flex: 1; min-width: 0; }
+.supplier-info-row .info-label { font-size: 12px; color: #64748b; }
+.supplier-info-row .info-value { font-size: 15px; color: #e2e8f0; font-weight: 500; word-break: break-all; }
+.supplier-info-row .info-value a { color: #38bdf8; text-decoration: none; }
+.supplier-info-row .info-value a:hover { text-decoration: underline; }
+.supplier-info-row .info-action { flex-shrink: 0; }
+.btn-icon { width: 38px; height: 38px; border-radius: 10px; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.btn-call { background: #22c55e; color: #fff; }
+.btn-call:hover { background: #4ade80; }
+.btn-link { background: #38bdf8; color: #0f172a; }
+.btn-link:hover { background: #7dd3fc; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #1e293b; border-radius: 16px; padding: 28px; width: 90%; max-width: 450px; border: 1px solid #334155; max-height: 90vh; overflow-y: auto; }
+.modal.wide { max-width: 550px; }
+.modal h3 { font-size: 20px; color: #38bdf8; margin-bottom: 20px; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #22c55e; color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; transition: transform 0.3s; z-index: 200; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { background: #ef4444; }
+
+/* ── Accounting ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: #0f172a; border-radius: 12px; padding: 16px; text-align: center; border: 1px solid #334155; }
+.stat-value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: #64748b; }
+.stat-sales .stat-value { color: #38bdf8; }
+.stat-capital .stat-value { color: #f59e0b; }
+.stat-profit .stat-value { color: #22c55e; }
+.stat-count .stat-value { color: #a78bfa; }
+.filter-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end; }
+.filter-row .form-group { flex: 1; min-width: 140px; }
+.sales-table-wrap { overflow-x: auto; }
+.sales-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+.sales-table th { background: #334155; color: #94a3b8; padding: 10px 12px; text-align: right; white-space: nowrap; position: sticky; top: 0; }
+.sales-table th:first-child { border-radius: 0 8px 0 0; }
+.sales-table th:last-child { border-radius: 8px 0 0 0; }
+.sales-table td { padding: 10px 12px; border-bottom: 1px solid #1e293b; background: #0f172a; white-space: nowrap; }
+.sales-table tr:hover td { background: #1e293b; }
+.profit-positive { color: #22c55e; font-weight: 600; }
+.profit-negative { color: #ef4444; font-weight: 600; }
+.notes-cell { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; }
+@media (max-width: 700px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>حاسبة تكلفة المواد</h1>
+  <div class="tabs" id="mainTabs">
+    <button class="tab active" onclick="switchView('calculate')">حساب التكلفة</button>
+    <button class="tab" onclick="switchView('manage')">إدارة المواد</button>
+    <button class="tab" onclick="switchView('packaging')">إدارة التغليف</button>
+    <button class="tab" onclick="switchView('accounting')">المحاسبة</button>
+  </div>
+
+  <!-- Calculate View -->
+  <div id="calculateView">
+    <div class="card">
+      <h2>حساب تكلفة القطعة</h2>
+      <div class="form-row">
+        <div class="form-group"><label>اختر القسم</label><select id="calcSection" onchange="loadCalcMaterials()"><option value="">-- اختر القسم --</option></select></div>
+        <div class="form-group"><label>اختر المادة</label><select id="calcMaterial"><option value="">-- اختر المادة --</option></select></div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;"><label>وزن القطعة (جرام)</label><input type="number" id="pieceWeight" placeholder="مثال: 100" min="0" step="any"></div>
+      <div class="toggle-section" id="pkgToggleSection"><div class="toggle-header" onclick="togglePackaging()"><div class="toggle-header-right"><span class="toggle-icon">&#128230;</span><div><div class="toggle-title">إضافة تغليف</div><div class="toggle-subtitle">اختر مواد التغليف المطلوبة</div></div></div><label class="switch" onclick="event.stopPropagation()"><input type="checkbox" id="pkgToggle" onchange="applyToggle('pkg')"><span class="slider"></span></label></div><div class="toggle-body" id="pkgBody"><div class="pkg-check-list" id="pkgCheckList"></div></div></div>
+      <div class="toggle-section" id="delToggleSection" style="margin-top:10px;"><div class="toggle-header" onclick="toggleDelivery()"><div class="toggle-header-right"><span class="toggle-icon">&#128666;</span><div><div class="toggle-title">إضافة توصيل</div><div class="toggle-subtitle">أضف تكلفة التوصيل للعميل</div></div></div><label class="switch" onclick="event.stopPropagation()"><input type="checkbox" id="delToggle" onchange="applyToggle('del')"><span class="slider"></span></label></div><div class="toggle-body" id="delBody"><div class="form-group" style="margin-top:8px;"><label>تكلفة التوصيل (د.ك)</label><input type="number" id="deliveryCost" placeholder="مثال: 1.000" min="0" step="any"></div></div></div>
+      <div class="btn-row"><button class="btn btn-success" onclick="calculateCost()">حساب التكلفة</button><button class="btn btn-secondary" onclick="clearCalc()">مسح الخانات</button></div>
+      <div class="result-box" id="resultBox"><div class="result-breakdown" id="resultBreakdown"></div><div class="result-divider"></div><div class="result-total"><span class="result-total-label">الإجمالي</span><div><span class="result-total-value" id="resultTotal">0.000</span> <span class="result-total-unit">د.ك</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- Manage Materials View -->
+  <div id="manageView" style="display:none;">
+    <div class="card">
+      <h2>الأقسام والمواد</h2>
+      <div class="btn-row" style="margin-bottom:20px;"><button class="btn btn-primary" onclick="showAddSectionModal()">+ إضافة قسم</button><button class="btn btn-success" onclick="showAddMaterialModal()">+ إضافة مادة</button></div>
+      <div class="tabs" id="sectionTabs" style="margin-bottom:16px;"></div>
+      <div id="materialsList"></div>
+    </div>
+  </div>
+
+  <!-- Manage Packaging View -->
+  <div id="packagingView" style="display:none;">
+    <div class="card">
+      <h2>&#128230; مواد التغليف</h2>
+      <p style="color:#64748b;font-size:14px;margin-bottom:16px;">أضف مواد التغليف هنا وحدد سعرها. عند حساب التكلفة تقدر تختار اللي تبيه منها.</p>
+      <div class="btn-row" style="margin-bottom:20px;"><button class="btn btn-success" onclick="showAddPkgModal()">+ إضافة مادة تغليف</button></div>
+      <div id="pkgMaterialsList"></div>
+    </div>
+  </div>
+
+  <!-- Accounting View -->
+  <div id="accountingView" style="display:none;">
+    <div class="card">
+      <h2>&#128200; المحاسبة / المبيعات</h2>
+      <div class="stats-grid">
+        <div class="stat-card stat-sales"><div class="stat-value" id="totalSales">0.000</div><div class="stat-label">إجمالي المبيعات</div></div>
+        <div class="stat-card stat-capital"><div class="stat-value" id="totalCapital">0.000</div><div class="stat-label">إجمالي رأس المال</div></div>
+        <div class="stat-card stat-profit"><div class="stat-value" id="totalProfit">0.000</div><div class="stat-label">إجمالي الأرباح</div></div>
+        <div class="stat-card stat-count"><div class="stat-value" id="totalCount">0</div><div class="stat-label">عدد المنتجات المباعة</div></div>
+      </div>
+      <div class="btn-row" style="margin-bottom:16px;"><button class="btn btn-success" onclick="showAddSaleModal()">+ إضافة عملية بيع</button></div>
+      <div class="filter-row">
+        <div class="form-group"><label>فلترة بالتاريخ من</label><input type="date" id="filterDateFrom" onchange="renderSales()"></div>
+        <div class="form-group"><label>إلى</label><input type="date" id="filterDateTo" onchange="renderSales()"></div>
+        <div class="form-group"><label>فلترة بالقسم</label><select id="filterSection" onchange="renderSales()"><option value="">الكل</option></select></div>
+        <div class="form-group"><label>بحث بالاسم</label><input type="text" id="filterName" placeholder="اسم المنتج..." oninput="renderSales()"></div>
+      </div>
+      <div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>التاريخ</th><th>المنتج</th><th>المادة</th><th>الوزن (g)</th><th>رأس المال</th><th>سعر البيع</th><th>الربح</th><th>ملاحظات</th><th>إجراءات</th></tr></thead><tbody id="salesTableBody"></tbody></table></div>
+      <div class="empty-state" id="salesEmpty" style="display:none;">لا توجد عمليات بيع مسجلة.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="sectionModal"><div class="modal"><h3>إضافة قسم جديد</h3><div class="form-group" style="margin-bottom:16px;"><label>اسم القسم</label><input type="text" id="newSectionName" placeholder="مثال: الشموع"></div><div class="btn-row"><button class="btn btn-primary" onclick="addSection()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('sectionModal')">إلغاء</button></div></div></div>
+
+<div class="modal-overlay" id="materialModal"><div class="modal"><h3 id="materialModalTitle">إضافة مادة جديدة</h3><div class="form-group" style="margin-bottom:12px;"><label>القسم</label><select id="matSection"><option value="">-- اختر --</option></select></div><div class="form-group" style="margin-bottom:12px;"><label>اسم المادة</label><input type="text" id="matName" placeholder="مثال: شمع صويا"></div><div class="form-group" style="margin-bottom:12px;"><label>سعر الشراء (د.ك)</label><input type="number" id="matPrice" placeholder="مثال: 10" min="0" step="any"></div><div class="form-row"><div class="form-group"><label>كمية الشراء</label><input type="number" id="matQty" placeholder="مثال: 1" min="0" step="any"></div><div class="form-group"><label>وحدة الكمية</label><select id="matUnit"><option value="kg">كيلو</option><option value="g">جرام</option></select></div></div><div class="form-row" style="margin-top:12px;"><div class="form-group"><label>رقم تلفون المورد</label><input type="tel" id="matPhone" placeholder="96512345678" dir="ltr"></div><div class="form-group"><label>الموقع الإلكتروني</label><input type="url" id="matWebsite" placeholder="www.example.com" dir="ltr"></div></div><div class="form-group" style="margin-top:12px;"><label>صورة المنتج (اختياري)</label><div class="img-upload-area" onclick="document.getElementById('matImage').click()"><div class="upload-text" id="imgPlaceholder">اضغط هنا لاختيار صورة</div><img id="imgPreview" style="display:none;"><input type="file" id="matImage" accept="image/*" onchange="handleImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="imgRemoveBtn" style="display:none;" onclick="removeImage(event)">حذف الصورة</button></div><input type="hidden" id="editMaterialId" value=""><input type="hidden" id="matImageData" value=""><div class="btn-row" style="margin-top:16px;"><button class="btn btn-primary" id="materialModalBtn" onclick="saveMaterial()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('materialModal')">إلغاء</button></div></div></div>
+
+<div class="modal-overlay" id="pkgModal"><div class="modal"><h3 id="pkgModalTitle">إضافة مادة تغليف</h3><div class="form-group" style="margin-bottom:12px;"><label>اسم مادة التغليف</label><input type="text" id="pkgName" placeholder="مثال: علبة كرتون"></div><div class="form-group" style="margin-bottom:12px;"><label>سعر القطعة الواحدة (د.ك)</label><input type="number" id="pkgPrice" placeholder="مثال: 0.250" min="0" step="any"></div><input type="hidden" id="editPkgId" value=""><div class="btn-row" style="margin-top:16px;"><button class="btn btn-primary" id="pkgModalBtn" onclick="savePkgMaterial()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('pkgModal')">إلغاء</button></div></div></div>
+
+<div class="modal-overlay" id="supplierModal"><div class="modal" style="max-width:400px;"><h3 id="supplierModalTitle">معلومات المادة</h3><div class="supplier-modal-content" id="supplierModalContent"></div><div class="btn-row" style="margin-top:16px;justify-content:center;"><button class="btn btn-secondary" onclick="closeModal('supplierModal')">إغلاق</button></div></div></div>
+
+<!-- Sale Modal -->
+<div class="modal-overlay" id="saleModal"><div class="modal wide"><h3 id="saleModalTitle">إضافة عملية بيع</h3>
+<div class="form-group" style="margin-bottom:12px;"><label>اسم المنتج المباع</label><input type="text" id="saleProduct" placeholder="مثال: شمعة معطرة"></div>
+<div class="form-row">
+  <div class="form-group"><label>القسم</label><select id="saleSection" onchange="loadSaleMaterials()"><option value="">-- اختر --</option></select></div>
+  <div class="form-group"><label>المادة المستخدمة</label><select id="saleMaterial"><option value="">-- اختر --</option></select></div>
+</div>
+<div class="form-row">
+  <div class="form-group"><label>وزن المادة المستخدمة (جرام)</label><input type="number" id="saleWeight" placeholder="مثال: 100" min="0" step="any"></div>
+  <div class="form-group"><label>سعر البيع (د.ك)</label><input type="number" id="salePrice" placeholder="مثال: 3.000" min="0" step="any"></div>
+</div>
+<div class="form-group" style="margin-bottom:12px;"><label>تاريخ البيع</label><input type="date" id="saleDate"></div>
+<div class="form-group" style="margin-bottom:12px;"><label>ملاحظات (اختياري)</label><textarea id="saleNotes" placeholder="ملاحظات إضافية..."></textarea></div>
+<input type="hidden" id="editSaleId" value="">
+<div class="btn-row" style="margin-top:16px;"><button class="btn btn-success" id="saleModalBtn" onclick="saveSale()">تسجيل البيع</button><button class="btn btn-secondary" onclick="closeModal('saleModal')">إلغاء</button></div>
+</div></div>
+
+<div class="modal-overlay" id="deleteModal"><div class="modal" style="text-align:center;"><h3>تأكيد الحذف</h3><p style="margin-bottom:20px;color:#94a3b8;" id="deleteMsg">هل أنت متأكد؟</p><input type="hidden" id="deleteId" value=""><input type="hidden" id="deleteType" value=""><div class="btn-row" style="justify-content:center;"><button class="btn btn-danger" onclick="confirmDelete()">حذف</button><button class="btn btn-secondary" onclick="closeModal('deleteModal')">إلغاء</button></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'material_cost_data';
+let data = loadData();
+let activeManageSection = null;
+
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    const d = JSON.parse(saved);
+    if (!d.packaging) d.packaging = [];
+    if (!d.nextPkgId) d.nextPkgId = 1;
+    if (!d.sales) d.sales = [];
+    if (!d.nextSaleId) d.nextSaleId = 1;
+    return d;
+  }
+  return {
+    sections: ['الشموع', 'السيليكون', 'الفيلمنت'],
+    materials: [
+      { id:1, section:'الشموع', name:'شمع بارافين', price:0, qty:0, unit:'kg' },
+      { id:2, section:'الشموع', name:'شمع نحل', price:0, qty:0, unit:'kg' },
+      { id:3, section:'الشموع', name:'شمع صويا', price:0, qty:0, unit:'kg' },
+      { id:4, section:'السيليكون', name:'سيليكون نوع 1', price:0, qty:0, unit:'kg' },
+      { id:5, section:'السيليكون', name:'سيليكون نوع 2', price:0, qty:0, unit:'kg' },
+      { id:6, section:'الفيلمنت', name:'PLA', price:0, qty:0, unit:'kg' },
+      { id:7, section:'الفيلمنت', name:'PETG', price:0, qty:0, unit:'kg' },
+      { id:8, section:'الفيلمنت', name:'ABS', price:0, qty:0, unit:'kg' },
+      { id:9, section:'الفيلمنت', name:'TPU', price:0, qty:0, unit:'kg' },
+    ],
+    packaging: [], sales: [],
+    nextId: 10, nextPkgId: 1, nextSaleId: 1
+  };
+}
+
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function showToast(msg, err) { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',2500); }
+
+// ── Views ──
+const views = ['calculate','manage','packaging','accounting'];
+function switchView(view) {
+  document.querySelectorAll('#mainTabs .tab').forEach((t,i) => t.classList.toggle('active', views[i]===view));
+  views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = v===view?'block':'none'; });
+  if(view==='calculate'){refreshCalcSections();refreshPkgChecklist();}
+  if(view==='manage')refreshManageView();
+  if(view==='packaging')renderPkgMaterials();
+  if(view==='accounting'){refreshFilterSections();renderSales();}
+}
+
+// ── Toggles ──
+function togglePackaging(){const c=document.getElementById('pkgToggle');c.checked=!c.checked;applyToggle('pkg');}
+function toggleDelivery(){const c=document.getElementById('delToggle');c.checked=!c.checked;applyToggle('del');}
+function applyToggle(p){const c=document.getElementById(p+'Toggle'),b=document.getElementById(p+'Body'),s=document.getElementById(p+'ToggleSection');if(c.checked){b.classList.add('open');s.classList.add('active');}else{b.classList.remove('open');s.classList.remove('active');}}
+
+// ── Calculate ──
+function refreshCalcSections(){const s=document.getElementById('calcSection'),p=s.value;s.innerHTML='<option value="">-- اختر القسم --</option>';data.sections.forEach(x=>{if(data.materials.some(m=>m.section===x&&m.price>0&&m.qty>0))s.innerHTML+=`<option value="${x}">${x}</option>`;});if(p&&[...s.options].some(o=>o.value===p))s.value=p;loadCalcMaterials();}
+function loadCalcMaterials(){const sec=document.getElementById('calcSection').value,s=document.getElementById('calcMaterial');s.innerHTML='<option value="">-- اختر المادة --</option>';if(!sec)return;data.materials.filter(m=>m.section===sec&&m.price>0&&m.qty>0).forEach(m=>s.innerHTML+=`<option value="${m.id}">${m.name}</option>`);}
+function refreshPkgChecklist(){const l=document.getElementById('pkgCheckList'),p=data.packaging.filter(x=>x.price>0);if(!p.length){l.innerHTML='<div class="empty-state" style="padding:16px;">لا توجد مواد تغليف.</div>';return;}l.innerHTML=p.map(x=>`<label class="pkg-check-item"><input type="checkbox" value="${x.id}" class="pkg-cb"><span class="pkg-name">${x.name}</span><span class="pkg-price">${x.price.toFixed(3)} د.ك</span></label>`).join('');}
+
+function calculateCost(){
+  const matId=parseInt(document.getElementById('calcMaterial').value),weight=parseFloat(document.getElementById('pieceWeight').value);
+  if(!matId){showToast('اختر المادة أولاً',true);return;}if(!weight||weight<=0){showToast('أدخل وزن القطعة',true);return;}
+  const mat=data.materials.find(m=>m.id===matId);if(!mat)return;
+  const qg=mat.unit==='kg'?mat.qty*1000:mat.qty,mc=(mat.price/qg)*weight;
+  let bh=`<div class="result-row"><span>تكلفة المادة (${mat.name} - ${weight}g)</span><span>${mc.toFixed(3)} د.ك</span></div>`,total=mc;
+  if(document.getElementById('pkgToggle').checked){document.querySelectorAll('.pkg-cb:checked').forEach(cb=>{const pk=data.packaging.find(p=>p.id===parseInt(cb.value));if(pk){total+=pk.price;bh+=`<div class="result-row sub"><span>${pk.name}</span><span>${pk.price.toFixed(3)} د.ك</span></div>`;}});}
+  if(document.getElementById('delToggle').checked){const dc=parseFloat(document.getElementById('deliveryCost').value)||0;if(dc>0){total+=dc;bh+=`<div class="result-row"><span>&#128666; التوصيل</span><span>${dc.toFixed(3)} د.ك</span></div>`;}}
+  document.getElementById('resultBreakdown').innerHTML=bh;document.getElementById('resultTotal').textContent=total.toFixed(3);document.getElementById('resultBox').classList.add('show');
+}
+function clearCalc(){document.getElementById('calcSection').value='';document.getElementById('calcMaterial').innerHTML='<option value="">-- اختر المادة --</option>';document.getElementById('pieceWeight').value='';document.getElementById('deliveryCost').value='';document.querySelectorAll('.pkg-cb').forEach(c=>c.checked=false);document.getElementById('pkgToggle').checked=false;applyToggle('pkg');document.getElementById('delToggle').checked=false;applyToggle('del');document.getElementById('resultBox').classList.remove('show');}
+
+// ── Manage Materials ──
+function refreshManageView(){const t=document.getElementById('sectionTabs');t.innerHTML='';data.sections.forEach((s,i)=>{if(!activeManageSection&&i===0)activeManageSection=s;t.innerHTML+=`<button class="tab ${s===activeManageSection?'active':''}" onclick="selectManageSection('${s}')">${s}</button>`;});renderMaterials();}
+function selectManageSection(s){activeManageSection=s;refreshManageView();}
+function renderMaterials(){const l=document.getElementById('materialsList');if(!activeManageSection){l.innerHTML='<div class="empty-state">لا توجد أقسام.</div>';return;}const ms=data.materials.filter(m=>m.section===activeManageSection);if(!ms.length){l.innerHTML=`<div class="empty-state">لا توجد مواد.</div><div style="text-align:center;margin-top:12px;"><button class="btn btn-danger btn-sm" onclick="showDeleteSection('${activeManageSection}')">حذف القسم</button></div>`;return;}let h='';ms.forEach(m=>{const ul=m.unit==='kg'?'كيلو':'جرام',cf=m.price>0&&m.qty>0,im=m.image?`<img class="material-img" src="${m.image}">`:'<div class="material-img-placeholder">&#128247;</div>';h+=`<div class="material-item"><div class="material-item-clickable" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;" onclick="showSupplierInfo(${m.id})">${im}<div class="material-info"><div class="material-name">${m.name}</div><div class="material-details">${cf?m.price+' د.ك / '+m.qty+' '+ul:'لم يتم تعيين السعر'}</div></div></div><div class="material-actions"><button class="btn btn-warning btn-sm" onclick="showEditMaterial(${m.id})">تعديل</button><button class="btn btn-danger btn-sm" onclick="showDeleteMaterial(${m.id})">حذف</button></div></div>`;});h+=`<div style="text-align:center;margin-top:12px;"><button class="btn btn-danger btn-sm" onclick="showDeleteSection('${activeManageSection}')">حذف القسم "${activeManageSection}"</button></div>`;l.innerHTML=h;}
+
+// ── Manage Packaging ──
+function renderPkgMaterials(){const l=document.getElementById('pkgMaterialsList');if(!data.packaging.length){l.innerHTML='<div class="empty-state">لا توجد مواد تغليف.</div>';return;}l.innerHTML=data.packaging.map(p=>`<div class="material-item"><div class="material-img-placeholder">&#128230;</div><div class="material-info"><div class="material-name">${p.name}</div><div class="material-details">${p.price>0?p.price.toFixed(3)+' د.ك / قطعة':'لم يتم تعيين السعر'}</div></div><div class="material-actions"><button class="btn btn-warning btn-sm" onclick="showEditPkg(${p.id})">تعديل</button><button class="btn btn-danger btn-sm" onclick="showDeletePkg(${p.id})">حذف</button></div></div>`).join('');}
+function showAddPkgModal(){document.getElementById('pkgModalTitle').textContent='إضافة مادة تغليف';document.getElementById('pkgModalBtn').textContent='إضافة';document.getElementById('editPkgId').value='';document.getElementById('pkgName').value='';document.getElementById('pkgPrice').value='';document.getElementById('pkgModal').classList.add('show');}
+function showEditPkg(id){const p=data.packaging.find(x=>x.id===id);if(!p)return;document.getElementById('pkgModalTitle').textContent='تعديل مادة تغليف';document.getElementById('pkgModalBtn').textContent='حفظ';document.getElementById('editPkgId').value=id;document.getElementById('pkgName').value=p.name;document.getElementById('pkgPrice').value=p.price||'';document.getElementById('pkgModal').classList.add('show');}
+function savePkgMaterial(){const n=document.getElementById('pkgName').value.trim(),pr=parseFloat(document.getElementById('pkgPrice').value)||0,eid=document.getElementById('editPkgId').value;if(!n){showToast('أدخل اسم مادة التغليف',true);return;}if(eid){const p=data.packaging.find(x=>x.id===parseInt(eid));if(p){p.name=n;p.price=pr;}showToast('تم التعديل');}else{data.packaging.push({id:data.nextPkgId++,name:n,price:pr});showToast('تم الإضافة');}saveData();closeModal('pkgModal');renderPkgMaterials();}
+function showDeletePkg(id){const p=data.packaging.find(x=>x.id===id);if(!p)return;document.getElementById('deleteMsg').textContent=`حذف "${p.name}"؟`;document.getElementById('deleteId').value=id;document.getElementById('deleteType').value='packaging';document.getElementById('deleteModal').classList.add('show');}
+
+// ── Section/Material Modals ──
+function showAddSectionModal(){document.getElementById('newSectionName').value='';document.getElementById('sectionModal').classList.add('show');}
+function addSection(){const n=document.getElementById('newSectionName').value.trim();if(!n){showToast('أدخل اسم القسم',true);return;}if(data.sections.includes(n)){showToast('موجود مسبقاً',true);return;}data.sections.push(n);saveData();activeManageSection=n;closeModal('sectionModal');refreshManageView();showToast('تم إضافة القسم');}
+function populateSectionSelect(id){const s=document.getElementById(id);s.innerHTML='<option value="">-- اختر --</option>';data.sections.forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`);}
+function handleImageUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){const img=new Image();img.onload=function(){const c=document.createElement('canvas'),mx=200;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);const d=c.toDataURL('image/jpeg',0.7);document.getElementById('matImageData').value=d;document.getElementById('imgPreview').src=d;document.getElementById('imgPreview').style.display='block';document.getElementById('imgPlaceholder').style.display='none';document.getElementById('imgRemoveBtn').style.display='inline-block';};img.src=ev.target.result;};r.readAsDataURL(f);}
+function removeImage(e){e.stopPropagation();document.getElementById('matImageData').value='';document.getElementById('matImage').value='';document.getElementById('imgPreview').style.display='none';document.getElementById('imgPlaceholder').style.display='block';document.getElementById('imgRemoveBtn').style.display='none';}
+function resetImageUI(){document.getElementById('matImageData').value='';document.getElementById('matImage').value='';document.getElementById('imgPreview').style.display='none';document.getElementById('imgPlaceholder').style.display='block';document.getElementById('imgRemoveBtn').style.display='none';}
+function showAddMaterialModal(){document.getElementById('materialModalTitle').textContent='إضافة مادة جديدة';document.getElementById('materialModalBtn').textContent='إضافة';document.getElementById('editMaterialId').value='';document.getElementById('matName').value='';document.getElementById('matPrice').value='';document.getElementById('matQty').value='';document.getElementById('matUnit').value='kg';document.getElementById('matPhone').value='';document.getElementById('matWebsite').value='';resetImageUI();populateSectionSelect('matSection');if(activeManageSection)document.getElementById('matSection').value=activeManageSection;document.getElementById('materialModal').classList.add('show');}
+function showEditMaterial(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('materialModalTitle').textContent='تعديل مادة';document.getElementById('materialModalBtn').textContent='حفظ';document.getElementById('editMaterialId').value=id;populateSectionSelect('matSection');document.getElementById('matSection').value=m.section;document.getElementById('matName').value=m.name;document.getElementById('matPrice').value=m.price||'';document.getElementById('matQty').value=m.qty||'';document.getElementById('matUnit').value=m.unit;document.getElementById('matPhone').value=m.phone||'';document.getElementById('matWebsite').value=m.website||'';if(m.image){document.getElementById('matImageData').value=m.image;document.getElementById('imgPreview').src=m.image;document.getElementById('imgPreview').style.display='block';document.getElementById('imgPlaceholder').style.display='none';document.getElementById('imgRemoveBtn').style.display='inline-block';}else resetImageUI();document.getElementById('materialModal').classList.add('show');}
+function saveMaterial(){const sec=document.getElementById('matSection').value,n=document.getElementById('matName').value.trim(),pr=parseFloat(document.getElementById('matPrice').value)||0,q=parseFloat(document.getElementById('matQty').value)||0,u=document.getElementById('matUnit').value,img=document.getElementById('matImageData').value||'',ph=document.getElementById('matPhone').value.trim(),ws=document.getElementById('matWebsite').value.trim(),eid=document.getElementById('editMaterialId').value;if(!sec){showToast('اختر القسم',true);return;}if(!n){showToast('أدخل اسم المادة',true);return;}if(eid){const m=data.materials.find(x=>x.id===parseInt(eid));if(m){m.section=sec;m.name=n;m.price=pr;m.qty=q;m.unit=u;m.image=img;m.phone=ph;m.website=ws;}showToast('تم التعديل');}else{data.materials.push({id:data.nextId++,section:sec,name:n,price:pr,qty:q,unit:u,image:img,phone:ph,website:ws});showToast('تم الإضافة');}saveData();closeModal('materialModal');activeManageSection=sec;refreshManageView();}
+
+// ── Supplier Info ──
+function showSupplierInfo(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('supplierModalTitle').textContent=m.name;const ul=m.unit==='kg'?'كيلو':'جرام',im=m.image?`<img class="supplier-img" src="${m.image}">`:'<div class="supplier-img-placeholder">&#128247;</div>';let ws=m.website||'';if(ws&&!ws.startsWith('http'))ws='https://'+ws;let h=im+'<div class="supplier-info-grid">';h+=`<div class="supplier-info-row"><span class="info-icon">&#127991;</span><div class="info-content"><div class="info-label">القسم</div><div class="info-value">${m.section}</div></div></div>`;if(m.price>0&&m.qty>0)h+=`<div class="supplier-info-row"><span class="info-icon">&#128176;</span><div class="info-content"><div class="info-label">السعر</div><div class="info-value">${m.price} د.ك / ${m.qty} ${ul}</div></div></div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#128222;</span><div class="info-content"><div class="info-label">رقم تلفون المورد</div><div class="info-value">${m.phone||'لم يتم إضافته'}</div></div>${m.phone?`<div class="info-action"><a href="tel:${m.phone}" class="btn-icon btn-call">&#128222;</a></div>`:''}</div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#127760;</span><div class="info-content"><div class="info-label">الموقع الإلكتروني</div><div class="info-value">${m.website?`<a href="${ws}" target="_blank">${m.website}</a>`:'لم يتم إضافته'}</div></div>${m.website?`<div class="info-action"><a href="${ws}" target="_blank" class="btn-icon btn-link">&#128279;</a></div>`:''}</div>`;h+='</div>';document.getElementById('supplierModalContent').innerHTML=h;document.getElementById('supplierModal').classList.add('show');}
+
+// ══════════════════════════════════
+// ── ACCOUNTING / SALES ──
+// ══════════════════════════════════
+function getMatCostPerGram(mat) {
+  if (!mat || !mat.price || !mat.qty) return 0;
+  const grams = mat.unit === 'kg' ? mat.qty * 1000 : mat.qty;
+  return mat.price / grams;
+}
+
+function refreshFilterSections() {
+  const s = document.getElementById('filterSection');
+  const prev = s.value;
+  s.innerHTML = '<option value="">الكل</option>';
+  data.sections.forEach(x => s.innerHTML += `<option value="${x}">${x}</option>`);
+  if (prev) s.value = prev;
+}
+
+function showAddSaleModal() {
+  document.getElementById('saleModalTitle').textContent = 'إضافة عملية بيع';
+  document.getElementById('saleModalBtn').textContent = 'تسجيل البيع';
+  document.getElementById('editSaleId').value = '';
+  document.getElementById('saleProduct').value = '';
+  document.getElementById('saleWeight').value = '';
+  document.getElementById('salePrice').value = '';
+  document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('saleNotes').value = '';
+  populateSectionSelect('saleSection');
+  document.getElementById('saleMaterial').innerHTML = '<option value="">-- اختر --</option>';
+  document.getElementById('saleModal').classList.add('show');
+}
+
+function showEditSale(id) {
+  const s = data.sales.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('saleModalTitle').textContent = 'تعديل عملية بيع';
+  document.getElementById('saleModalBtn').textContent = 'حفظ التعديل';
+  document.getElementById('editSaleId').value = id;
+  document.getElementById('saleProduct').value = s.productName;
+  populateSectionSelect('saleSection');
+  document.getElementById('saleSection').value = s.section || '';
+  loadSaleMaterials();
+  document.getElementById('saleMaterial').value = s.materialId;
+  document.getElementById('saleWeight').value = s.weight;
+  document.getElementById('salePrice').value = s.sellPrice;
+  document.getElementById('saleDate').value = s.date;
+  document.getElementById('saleNotes').value = s.notes || '';
+  document.getElementById('saleModal').classList.add('show');
+}
+
+function loadSaleMaterials() {
+  const sec = document.getElementById('saleSection').value;
+  const s = document.getElementById('saleMaterial');
+  s.innerHTML = '<option value="">-- اختر --</option>';
+  if (!sec) return;
+  data.materials.filter(m => m.section === sec && m.price > 0 && m.qty > 0).forEach(m => {
+    s.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+  });
+}
+
+function saveSale() {
+  const productName = document.getElementById('saleProduct').value.trim();
+  const section = document.getElementById('saleSection').value;
+  const materialId = parseInt(document.getElementById('saleMaterial').value);
+  const weight = parseFloat(document.getElementById('saleWeight').value);
+  const sellPrice = parseFloat(document.getElementById('salePrice').value);
+  const date = document.getElementById('saleDate').value;
+  const notes = document.getElementById('saleNotes').value.trim();
+  const editId = document.getElementById('editSaleId').value;
+
+  if (!productName) { showToast('أدخل اسم المنتج', true); return; }
+  if (!materialId) { showToast('اختر المادة المستخدمة', true); return; }
+  if (!weight || weight <= 0) { showToast('أدخل وزن المادة المستخدمة', true); return; }
+  if (sellPrice === undefined || sellPrice === null || isNaN(sellPrice) || sellPrice < 0) { showToast('أدخل سعر البيع', true); return; }
+  if (!date) { showToast('أدخل تاريخ البيع', true); return; }
+
+  const mat = data.materials.find(m => m.id === materialId);
+  if (!mat) { showToast('المادة غير موجودة', true); return; }
+
+  const capitalCost = getMatCostPerGram(mat) * weight;
+  const profit = sellPrice - capitalCost;
+
+  if (editId) {
+    const s = data.sales.find(x => x.id === parseInt(editId));
+    if (s) {
+      s.productName = productName; s.section = section; s.materialId = materialId;
+      s.materialName = mat.name; s.weight = weight; s.capitalCost = capitalCost;
+      s.sellPrice = sellPrice; s.profit = profit; s.date = date; s.notes = notes;
+    }
+    showToast('تم تعديل عملية البيع');
+  } else {
+    data.sales.push({
+      id: data.nextSaleId++, productName, section, materialId,
+      materialName: mat.name, weight, capitalCost, sellPrice, profit, date, notes
+    });
+    showToast('تم تسجيل عملية البيع');
+  }
+  saveData();
+  closeModal('saleModal');
+  renderSales();
+}
+
+function showDeleteSale(id) {
+  document.getElementById('deleteMsg').textContent = 'هل أنت متأكد من حذف عملية البيع هذه؟';
+  document.getElementById('deleteId').value = id;
+  document.getElementById('deleteType').value = 'sale';
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+function getFilteredSales() {
+  let sales = [...data.sales];
+  const from = document.getElementById('filterDateFrom').value;
+  const to = document.getElementById('filterDateTo').value;
+  const sec = document.getElementById('filterSection').value;
+  const name = document.getElementById('filterName').value.trim().toLowerCase();
+  if (from) sales = sales.filter(s => s.date >= from);
+  if (to) sales = sales.filter(s => s.date <= to);
+  if (sec) sales = sales.filter(s => s.section === sec);
+  if (name) sales = sales.filter(s => s.productName.toLowerCase().includes(name) || s.materialName.toLowerCase().includes(name));
+  sales.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  return sales;
+}
+
+function renderSales() {
+  const filtered = getFilteredSales();
+  const tbody = document.getElementById('salesTableBody');
+  const emptyEl = document.getElementById('salesEmpty');
+
+  let totalSales = 0, totalCapital = 0, totalProfit = 0;
+  filtered.forEach(s => { totalSales += s.sellPrice; totalCapital += s.capitalCost; totalProfit += s.profit; });
+
+  document.getElementById('totalSales').textContent = totalSales.toFixed(3);
+  document.getElementById('totalCapital').textContent = totalCapital.toFixed(3);
+  document.getElementById('totalProfit').textContent = totalProfit.toFixed(3);
+  document.getElementById('totalCount').textContent = filtered.length;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  tbody.innerHTML = filtered.map(s => {
+    const profitClass = s.profit >= 0 ? 'profit-positive' : 'profit-negative';
+    return `<tr>
+      <td>${s.date}</td>
+      <td>${s.productName}</td>
+      <td>${s.materialName}</td>
+      <td>${s.weight}</td>
+      <td>${s.capitalCost.toFixed(3)}</td>
+      <td>${s.sellPrice.toFixed(3)}</td>
+      <td class="${profitClass}">${s.profit.toFixed(3)}</td>
+      <td class="notes-cell" title="${s.notes||''}">${s.notes||'-'}</td>
+      <td><div class="material-actions"><button class="btn btn-warning btn-sm" onclick="showEditSale(${s.id})">تعديل</button><button class="btn btn-danger btn-sm" onclick="showDeleteSale(${s.id})">حذف</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Delete ──
+function showDeleteMaterial(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('deleteMsg').textContent=`حذف "${m.name}"؟`;document.getElementById('deleteId').value=id;document.getElementById('deleteType').value='material';document.getElementById('deleteModal').classList.add('show');}
+function showDeleteSection(name){document.getElementById('deleteMsg').textContent=`حذف قسم "${name}" وجميع المواد بداخله؟`;document.getElementById('deleteId').value=name;document.getElementById('deleteType').value='section';document.getElementById('deleteModal').classList.add('show');}
+
+function confirmDelete(){
+  const type=document.getElementById('deleteType').value,id=document.getElementById('deleteId').value;
+  if(type==='material'){data.materials=data.materials.filter(m=>m.id!==parseInt(id));showToast('تم الحذف');}
+  else if(type==='section'){data.sections=data.sections.filter(s=>s!==id);data.materials=data.materials.filter(m=>m.section!==id);activeManageSection=data.sections[0]||null;showToast('تم حذف القسم');}
+  else if(type==='packaging'){data.packaging=data.packaging.filter(p=>p.id!==parseInt(id));showToast('تم الحذف');renderPkgMaterials();}
+  else if(type==='sale'){data.sales=data.sales.filter(s=>s.id!==parseInt(id));showToast('تم حذف عملية البيع');renderSales();}
+  saveData();closeModal('deleteModal');
+  if(type==='material'||type==='section')refreshManageView();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.show').forEach(m=>m.classList.remove('show'));});
+
+refreshCalcSections();
+refreshPkgChecklist();
+</script>
+</body>
+</html>
