@@ -365,7 +365,28 @@ function showEditMaterial(id){const m=data.materials.find(x=>x.id===id);if(!m)re
 function saveMaterial(){const sec=document.getElementById('matSection').value,n=document.getElementById('matName').value.trim(),pr=parseFloat(document.getElementById('matPrice').value)||0,q=parseFloat(document.getElementById('matQty').value)||0,u=document.getElementById('matUnit').value,img=document.getElementById('matImageData').value||'',ph=document.getElementById('matPhone').value.trim(),ws=document.getElementById('matWebsite').value.trim(),eid=document.getElementById('editMaterialId').value;if(!sec){showToast('اختر القسم',true);return;}if(!n){showToast('أدخل اسم المادة',true);return;}if(eid){const m=data.materials.find(x=>x.id===parseInt(eid));if(m){m.section=sec;m.name=n;m.price=pr;m.qty=q;m.unit=u;m.image=img;m.phone=ph;m.website=ws;}showToast('تم التعديل');}else{data.materials.push({id:data.nextId++,section:sec,name:n,price:pr,qty:q,unit:u,image:img,phone:ph,website:ws});showToast('تم الإضافة');}saveData();closeModal('materialModal');activeManageSection=sec;refreshManageView();}
 
 // ── Supplier Info ──
-function showSupplierInfo(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('supplierModalTitle').textContent=m.name;const ul=m.unit==='kg'?'كيلو':'جرام',im=m.image?`<img class="supplier-img" src="${m.image}">`:'<div class="supplier-img-placeholder">&#128247;</div>';let ws=m.website||'';if(ws&&!ws.startsWith('http'))ws='https://'+ws;let h=im+'<div class="supplier-info-grid">';h+=`<div class="supplier-info-row"><span class="info-icon">&#127991;</span><div class="info-content"><div class="info-label">القسم</div><div class="info-value">${m.section}</div></div></div>`;if(m.price>0&&m.qty>0)h+=`<div class="supplier-info-row"><span class="info-icon">&#128176;</span><div class="info-content"><div class="info-label">السعر</div><div class="info-value">${m.price} د.ك / ${m.qty} ${ul}</div></div></div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#128222;</span><div class="info-content"><div class="info-label">رقم تلفون المورد</div><div class="info-value">${m.phone||'لم يتم إضافته'}</div></div>${m.phone?`<div class="info-action"><a href="tel:${m.phone}" class="btn-icon btn-call">&#128222;</a></div>`:''}</div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#127760;</span><div class="info-content"><div class="info-label">الموقع الإلكتروني</div><div class="info-value">${m.website?`<a href="${ws}" target="_blank">${m.website}</a>`:'لم يتم إضافته'}</div></div>${m.website?`<div class="info-action"><a href="${ws}" target="_blank" class="btn-icon btn-link">&#128279;</a></div>`:''}</div>`;h+='</div>';document.getElementById('supplierModalContent').innerHTML=h;document.getElementById('supplierModal').classList.add('show');}
+function waLink(m){
+  const msg = 'مرحباً 👋\nأستفسر عن هذا المنتج: ' + m.name + '\nهل هو متوفر حالياً؟ وكم السعر؟\n\nHi 👋\nI\'m asking about this product: ' + m.name + '\nIs it available? And what is the price?';
+  return 'https://wa.me/' + m.phone + '?text=' + encodeURIComponent(msg);
+}
+async function shareProductImage(id){
+  const m = data.materials.find(x=>x.id===id);
+  if(!m || !m.image) return;
+  try{
+    const resp = await fetch(m.image);
+    const blob = await resp.blob();
+    const file = new File([blob], (m.name||'product') + '.jpg', {type: blob.type || 'image/jpeg'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], text: m.name});
+    } else {
+      const a = document.createElement('a');
+      a.href = m.image; a.download = (m.name||'product') + '.jpg';
+      document.body.appendChild(a); a.click(); a.remove();
+      showToast('المتصفح ما يدعم المشاركة المباشرة، تم تحميل الصورة بدلاً منها');
+    }
+  }catch(e){ showToast('تعذرت مشاركة الصورة', true); }
+}
+function showSupplierInfo(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('supplierModalTitle').textContent=m.name;const ul=m.unit==='kg'?'كيلو':'جرام',im=m.image?`<img class="supplier-img" src="${m.image}">`:'<div class="supplier-img-placeholder">&#128247;</div>';let ws=m.website||'';if(ws&&!ws.startsWith('http'))ws='https://'+ws;let h=im+'<div class="supplier-info-grid">';h+=`<div class="supplier-info-row"><span class="info-icon">&#127991;</span><div class="info-content"><div class="info-label">القسم</div><div class="info-value">${m.section}</div></div></div>`;if(m.price>0&&m.qty>0)h+=`<div class="supplier-info-row"><span class="info-icon">&#128176;</span><div class="info-content"><div class="info-label">السعر</div><div class="info-value">${m.price} د.ك / ${m.qty} ${ul}</div></div></div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#128222;</span><div class="info-content"><div class="info-label">رقم تلفون المورد</div><div class="info-value">${m.phone||'لم يتم إضافته'}</div></div>${m.phone?`<div class="info-action" style="display:flex;gap:6px;"><a href="${waLink(m)}" target="_blank" class="btn-icon btn-call">&#128172;</a>${m.image?`<button class="btn-icon btn-link" onclick="shareProductImage(${m.id})">&#128247;</button>`:''}</div>`:''}</div>`;h+=`<div class="supplier-info-row"><span class="info-icon">&#127760;</span><div class="info-content"><div class="info-label">الموقع الإلكتروني</div><div class="info-value">${m.website?`<a href="${ws}" target="_blank">${m.website}</a>`:'لم يتم إضافته'}</div></div>${m.website?`<div class="info-action"><a href="${ws}" target="_blank" class="btn-icon btn-link">&#128279;</a></div>`:''}</div>`;h+='</div>';document.getElementById('supplierModalContent').innerHTML=h;document.getElementById('supplierModal').classList.add('show');}
 
 // ══════════════════════════════════
 // ── ACCOUNTING / SALES ──
