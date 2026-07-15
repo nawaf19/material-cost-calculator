@@ -113,6 +113,18 @@ option { background: #0f172a; }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.error { background: #ef4444; }
 
+/* ── Auth Gate ── */
+.auth-gate { position: fixed; inset: 0; background: #0f172a; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.auth-box { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 340px; text-align: center; }
+.auth-icon { font-size: 40px; margin-bottom: 12px; }
+.auth-box h2 { color: #38bdf8; font-size: 20px; margin-bottom: 20px; }
+.auth-box input { width: 100%; text-align: center; letter-spacing: 4px; font-size: 20px; margin-bottom: 14px; }
+.auth-box .btn { width: 100%; }
+.auth-error { color: #ef4444; font-size: 13px; margin-top: 12px; display: none; }
+.auth-error.show { display: block; }
+.auth-shake { animation: authShake 0.35s; }
+@keyframes authShake { 10%,90%{transform:translateX(-2px)} 20%,80%{transform:translateX(4px)} 30%,50%,70%{transform:translateX(-8px)} 40%,60%{transform:translateX(8px)} }
+
 /* ── Accounting ── */
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
 .stat-card { background: #0f172a; border-radius: 12px; padding: 16px; text-align: center; border: 1px solid #334155; }
@@ -141,7 +153,16 @@ option { background: #0f172a; }
 </style>
 </head>
 <body>
-<div class="app">
+<div class="auth-gate" id="authGate">
+  <div class="auth-box" id="authBox">
+    <div class="auth-icon">&#128274;</div>
+    <h2>الدخول محمي</h2>
+    <input type="password" id="authInput" inputmode="numeric" autocomplete="off" placeholder="الرقم السري">
+    <button class="btn btn-primary" onclick="checkAuth()">دخول</button>
+    <div class="auth-error" id="authError">الرقم السري غير صحيح</div>
+  </div>
+</div>
+<div class="app" id="appRoot" style="display:none;">
   <h1>حاسبة تكلفة المواد</h1>
   <div class="tabs" id="mainTabs">
     <button class="tab active" onclick="switchView('calculate')">حساب التكلفة</button>
@@ -242,6 +263,29 @@ option { background: #0f172a; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Auth Gate ──
+const AUTH_KEY = 'material_cost_auth';
+const AUTH_PIN = '232344';
+function unlockApp() {
+  document.getElementById('authGate').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+}
+function checkAuth() {
+  const input = document.getElementById('authInput');
+  if (input.value === AUTH_PIN) {
+    localStorage.setItem(AUTH_KEY, '1');
+    unlockApp();
+  } else {
+    const err = document.getElementById('authError'), box = document.getElementById('authBox');
+    err.classList.add('show');
+    box.classList.remove('auth-shake'); void box.offsetWidth; box.classList.add('auth-shake');
+    input.value = '';
+    input.focus();
+  }
+}
+document.getElementById('authInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkAuth(); });
+if (localStorage.getItem(AUTH_KEY) === '1') unlockApp();
+
 const STORAGE_KEY = 'material_cost_data';
 let data = loadData();
 let activeManageSection = null;
