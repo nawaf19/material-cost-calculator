@@ -17,6 +17,8 @@ h1 { text-align: center; font-size: 28px; padding: 24px 0; color: #38bdf8; borde
 .home-btn-blue { background: linear-gradient(135deg, #38bdf8, #0ea5e9); }
 .home-btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .home-btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.home-btn-add { background: transparent; border: 2px dashed #475569; color: #94a3b8; justify-content: center; }
+.home-btn-add:hover { border-color: #38bdf8; color: #38bdf8; }
 .back-btn { background: none; border: none; color: #38bdf8; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 0 18px; display: flex; align-items: center; gap: 6px; }
 .back-btn:hover { text-decoration: underline; }
 .material-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -192,11 +194,7 @@ option { background: #0f172a; }
     <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
     <div class="card">
       <h2>المواد</h2>
-      <div class="home-grid">
-        <button class="home-btn home-btn-blue" onclick="openMaterialsSection('الشموع')"><span class="home-btn-icon">&#128367;&#65039;</span><span class="home-btn-label">الشموع</span></button>
-        <button class="home-btn home-btn-green" onclick="openMaterialsSection('السيليكون')"><span class="home-btn-icon">&#129514;</span><span class="home-btn-label">السيليكون</span></button>
-        <button class="home-btn home-btn-orange" onclick="openMaterialsSection('الفيلمنت')"><span class="home-btn-icon">&#129525;</span><span class="home-btn-label">الفيلمنت</span></button>
-      </div>
+      <div class="home-grid" id="materialsHomeGrid"></div>
     </div>
   </div>
 
@@ -230,6 +228,8 @@ option { background: #0f172a; }
 </div>
 
 <!-- Modals -->
+
+<div class="modal-overlay" id="sectionModal"><div class="modal"><h3>إضافة قسم جديد</h3><div class="form-group" style="margin-bottom:16px;"><label>اسم القسم</label><input type="text" id="newSectionName" placeholder="مثال: الشموع"></div><div class="btn-row"><button class="btn btn-primary" onclick="addSection()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('sectionModal')">إلغاء</button></div></div></div>
 
 <div class="modal-overlay" id="materialModal"><div class="modal"><h3 id="materialModalTitle">إضافة مادة جديدة</h3><div class="form-group" style="margin-bottom:12px;"><label>القسم</label><select id="matSection"><option value="">-- اختر --</option></select></div><div class="form-group" style="margin-bottom:12px;"><label>اسم المادة</label><input type="text" id="matName" placeholder="مثال: شمع صويا"></div><div class="form-group" style="margin-bottom:12px;"><label>سعر الشراء (د.ك)</label><input type="number" id="matPrice" placeholder="مثال: 10" min="0" step="any"></div><div class="form-row"><div class="form-group"><label>كمية الشراء</label><input type="number" id="matQty" placeholder="مثال: 1" min="0" step="any"></div><div class="form-group"><label>وحدة الكمية</label><select id="matUnit"><option value="kg">كيلو</option><option value="g">جرام</option></select></div></div><div class="form-row" style="margin-top:12px;"><div class="form-group"><label>رقم تلفون المورد</label><input type="tel" id="matPhone" placeholder="96512345678" dir="ltr"></div><div class="form-group"><label>الموقع الإلكتروني</label><input type="url" id="matWebsite" placeholder="www.example.com" dir="ltr"></div></div><div class="form-group" style="margin-top:12px;"><label>صورة المنتج (اختياري)</label><div class="img-upload-area" onclick="document.getElementById('matImage').click()"><div class="upload-text" id="imgPlaceholder">اضغط هنا لاختيار صورة</div><img id="imgPreview" style="display:none;"><input type="file" id="matImage" accept="image/*" onchange="handleImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="imgRemoveBtn" style="display:none;" onclick="removeImage(event)">حذف الصورة</button></div><input type="hidden" id="editMaterialId" value=""><input type="hidden" id="matImageData" value=""><div class="btn-row" style="margin-top:16px;"><button class="btn btn-primary" id="materialModalBtn" onclick="saveMaterial()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('materialModal')">إلغاء</button></div></div></div>
 
@@ -345,6 +345,7 @@ function showView(view) {
   document.getElementById('materialsSectionView').style.display = 'none';
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = v===view?'block':'none'; });
   if(view==='calculate'){refreshCalcSections();refreshPkgChecklist();}
+  if(view==='manage')renderCategoryButtons();
   if(view==='packaging')renderPkgMaterials();
 }
 function goHome() {
@@ -377,6 +378,16 @@ function calculateCost(){
 function clearCalc(){document.getElementById('calcSection').value='';document.getElementById('calcMaterial').innerHTML='<option value="">-- اختر المادة --</option>';document.getElementById('pieceWeight').value='';document.getElementById('deliveryCost').value='';document.querySelectorAll('.pkg-cb').forEach(c=>c.checked=false);document.getElementById('pkgToggle').checked=false;applyToggle('pkg');document.getElementById('delToggle').checked=false;applyToggle('del');document.getElementById('resultBox').classList.remove('show');}
 
 // ── Manage Materials ──
+const SECTION_ICONS = { 'الشموع':'&#128367;&#65039;', 'السيليكون':'&#129514;', 'الفيلمنت':'&#129525;' };
+function sectionIcon(s){ return SECTION_ICONS[s] || '&#127991;&#65039;'; }
+function renderCategoryButtons(){
+  const g = document.getElementById('materialsHomeGrid');
+  let h = data.sections.map((s,i)=>`<button class="home-btn mcolor-${i%6}" onclick="openMaterialsSection('${s}')"><span class="home-btn-icon">${sectionIcon(s)}</span><span class="home-btn-label">${s}</span></button>`).join('');
+  h += `<button class="home-btn home-btn-add" onclick="showAddSectionModal()"><span class="home-btn-icon">&#10133;</span><span class="home-btn-label">إضافة قسم</span></button>`;
+  g.innerHTML = h;
+}
+function showAddSectionModal(){document.getElementById('newSectionName').value='';document.getElementById('sectionModal').classList.add('show');}
+function addSection(){const n=document.getElementById('newSectionName').value.trim();if(!n){showToast('أدخل اسم القسم',true);return;}if(data.sections.includes(n)){showToast('موجود مسبقاً',true);return;}data.sections.push(n);saveData();closeModal('sectionModal');renderCategoryButtons();showToast('تم إضافة القسم');}
 function openMaterialsSection(section){
   activeManageSection = section;
   document.getElementById('manageView').style.display = 'none';
