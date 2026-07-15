@@ -13,6 +13,16 @@ h1 { text-align: center; font-size: 28px; padding: 24px 0; color: #38bdf8; borde
 .tab { padding: 10px 20px; background: #1e293b; border: 2px solid #334155; border-radius: 10px; color: #94a3b8; cursor: pointer; font-size: 15px; font-family: inherit; transition: all 0.2s; }
 .tab:hover { border-color: #38bdf8; color: #38bdf8; }
 .tab.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: bold; }
+.home-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.home-btn { display: flex; align-items: center; gap: 18px; padding: 24px 22px; border: none; border-radius: 16px; cursor: pointer; font-family: inherit; color: #fff; text-align: right; transition: transform 0.15s; }
+.home-btn:hover { transform: translateY(-2px); }
+.home-btn-icon { font-size: 34px; flex-shrink: 0; }
+.home-btn-label { font-size: 19px; font-weight: 700; }
+.home-btn-blue { background: linear-gradient(135deg, #38bdf8, #0ea5e9); }
+.home-btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.home-btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.back-btn { background: none; border: none; color: #38bdf8; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 0 18px; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { text-decoration: underline; }
 .card { background: #1e293b; border-radius: 14px; padding: 24px; margin-bottom: 20px; border: 1px solid #334155; }
 .card h2 { font-size: 20px; margin-bottom: 16px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
@@ -142,14 +152,18 @@ option { background: #0f172a; }
 </div>
 <div class="app" id="appRoot" style="display:none;">
   <h1>حاسبة تكلفة المواد</h1>
-  <div class="tabs" id="mainTabs">
-    <button class="tab active" onclick="switchView('calculate')">حساب التكلفة</button>
-    <button class="tab" onclick="switchView('manage')">إدارة المواد</button>
-    <button class="tab" onclick="switchView('packaging')">إدارة التغليف</button>
+  <!-- Home Menu -->
+  <div id="homeView">
+    <div class="home-grid">
+      <button class="home-btn home-btn-blue" onclick="showView('calculate')"><span class="home-btn-icon">&#129518;</span><span class="home-btn-label">حساب التكلفة</span></button>
+      <button class="home-btn home-btn-green" onclick="showView('manage')"><span class="home-btn-icon">&#129521;</span><span class="home-btn-label">إدارة المواد</span></button>
+      <button class="home-btn home-btn-orange" onclick="showView('packaging')"><span class="home-btn-icon">&#128230;</span><span class="home-btn-label">إدارة التغليف</span></button>
+    </div>
   </div>
 
   <!-- Calculate View -->
-  <div id="calculateView">
+  <div id="calculateView" style="display:none;">
+    <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
     <div class="card">
       <h2>حساب تكلفة القطعة</h2>
       <div class="form-row">
@@ -166,6 +180,7 @@ option { background: #0f172a; }
 
   <!-- Manage Materials View -->
   <div id="manageView" style="display:none;">
+    <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
     <div class="card">
       <h2>الأقسام والمواد</h2>
       <div class="btn-row" style="margin-bottom:20px;"><button class="btn btn-primary" onclick="showAddSectionModal()">+ إضافة قسم</button><button class="btn btn-success" onclick="showAddMaterialModal()">+ إضافة مادة</button><button class="btn btn-warning" onclick="importAlherafyWax()">استيراد شمع Alherafy</button><button class="btn btn-warning" onclick="importAtiabWax()">استيراد شمع Atiab</button></div>
@@ -176,6 +191,7 @@ option { background: #0f172a; }
 
   <!-- Manage Packaging View -->
   <div id="packagingView" style="display:none;">
+    <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
     <div class="card">
       <h2>&#128230; مواد التغليف</h2>
       <p style="color:#64748b;font-size:14px;margin-bottom:16px;">أضف مواد التغليف هنا وحدد سعرها. عند حساب التكلفة تقدر تختار اللي تبيه منها.</p>
@@ -297,12 +313,16 @@ function showToast(msg, err) { const t=document.getElementById('toast'); t.textC
 
 // ── Views ──
 const views = ['calculate','manage','packaging'];
-function switchView(view) {
-  document.querySelectorAll('#mainTabs .tab').forEach((t,i) => t.classList.toggle('active', views[i]===view));
+function showView(view) {
+  document.getElementById('homeView').style.display = 'none';
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = v===view?'block':'none'; });
   if(view==='calculate'){refreshCalcSections();refreshPkgChecklist();}
   if(view==='manage')refreshManageView();
   if(view==='packaging')renderPkgMaterials();
+}
+function goHome() {
+  views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = 'none'; });
+  document.getElementById('homeView').style.display = 'block';
 }
 
 // ── Toggles ──
