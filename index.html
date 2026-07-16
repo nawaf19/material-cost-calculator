@@ -10,7 +10,7 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: 
 .app { max-width: 960px; margin: 0 auto; padding: 20px; }
 h1 { text-align: center; font-size: 28px; padding: 24px 0; color: #38bdf8; border-bottom: 2px solid #1e293b; margin-bottom: 24px; }
 .home-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
-.home-btn { display: flex; align-items: center; gap: 18px; padding: 24px 22px; border: none; border-radius: 16px; cursor: pointer; font-family: inherit; color: #fff; text-align: right; transition: transform 0.15s; }
+.home-btn { display: flex; align-items: center; gap: 18px; padding: 24px 22px; border: none; border-radius: 16px; cursor: pointer; font-family: inherit; color: #fff; text-align: right; text-decoration: none; transition: transform 0.15s; }
 .home-btn:hover { transform: translateY(-2px); }
 .home-btn-icon { font-size: 34px; flex-shrink: 0; }
 .home-btn-label { font-size: 19px; font-weight: 700; }
@@ -169,7 +169,7 @@ option { background: #0f172a; }
       <button class="home-btn home-btn-blue" onclick="showView('calculate')"><span class="home-btn-icon">&#129518;</span><span class="home-btn-label">حساب التكلفة</span></button>
       <button class="home-btn home-btn-green" onclick="showView('manage')"><span class="home-btn-icon">&#129521;</span><span class="home-btn-label">إدارة المواد</span></button>
       <button class="home-btn home-btn-orange" onclick="showView('packaging')"><span class="home-btn-icon">&#128230;</span><span class="home-btn-label">إدارة التغليف</span></button>
-      <button class="home-btn mcolor-3" onclick="showView('quickadd')"><span class="home-btn-icon">&#128248;</span><span class="home-btn-label">تسجيل سلعة</span></button>
+      <a class="home-btn mcolor-3" href="capture.html"><span class="home-btn-icon">&#128248;</span><span class="home-btn-label">تسجيل سلعة</span></a>
     </div>
   </div>
 
@@ -224,30 +224,6 @@ option { background: #0f172a; }
   <div id="materialView" style="display:none;">
     <button class="back-btn" onclick="backToMaterials()">&#8592; رجوع</button>
     <div class="card" id="materialViewContent"></div>
-  </div>
-
-  <!-- Quick Add: pick section -->
-  <div id="quickaddView" style="display:none;">
-    <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
-    <div class="card">
-      <h2>&#128248; تسجيل سلعة</h2>
-      <p style="color:#64748b;font-size:14px;margin-bottom:16px;">وين تبي تضيف السلعة؟</p>
-      <div class="home-grid" id="quickaddSections"></div>
-    </div>
-  </div>
-
-  <!-- Quick Add: capture form -->
-  <div id="quickaddFormView" style="display:none;">
-    <button class="back-btn" onclick="backToQuickaddSections()">&#8592; رجوع</button>
-    <div class="card">
-      <h2 id="quickaddSectionTitle"></h2>
-      <div class="form-group" style="margin-bottom:12px;"><label>اسم السلعة</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
-      <div class="form-group" style="margin-bottom:12px;"><label>صورة السلعة</label><div class="img-upload-area" onclick="document.getElementById('qaImage').click()"><div class="upload-text" id="qaImgPlaceholder">اضغط للتصوير أو اختيار صورة</div><img id="qaImgPreview" style="display:none;"><input type="file" id="qaImage" accept="image/*" capture="environment" onchange="handleQaImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="qaImgRemoveBtn" style="display:none;" onclick="removeQaImage(event)">حذف الصورة</button><input type="hidden" id="qaImageData" value=""></div>
-      <div class="form-group" style="margin-bottom:12px;"><label>السعر (د.ك)</label><input type="number" id="qaPrice" placeholder="مثال: 3.000" min="0" step="any"></div>
-      <div class="form-group" style="margin-bottom:12px;"><label>المكان</label><input type="text" id="qaPlace" placeholder="مثال: سوق المباركية - محل 5"></div>
-      <div class="form-group" style="margin-bottom:12px;"><label>رقم البايع (اختياري)</label><input type="tel" id="qaPhone" placeholder="96512345678" dir="ltr"></div>
-      <div class="btn-row" style="margin-top:16px;"><button class="btn btn-success" onclick="saveQuickadd()">حفظ السلعة</button></div>
-    </div>
   </div>
 
 </div>
@@ -392,23 +368,20 @@ function refreshCurrentView() {
 function showToast(msg, err) { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',2500); }
 
 // ── Views ──
-const views = ['calculate','manage','packaging','quickadd'];
+const views = ['calculate','manage','packaging'];
 function showView(view) {
   document.getElementById('homeView').style.display = 'none';
   document.getElementById('materialView').style.display = 'none';
   document.getElementById('materialsSectionView').style.display = 'none';
-  document.getElementById('quickaddFormView').style.display = 'none';
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = v===view?'block':'none'; });
   if(view==='calculate'){refreshCalcSections();refreshPkgChecklist();}
   if(view==='manage')renderCategoryButtons();
   if(view==='packaging')renderPkgMaterials();
-  if(view==='quickadd')renderQuickaddSections();
 }
 function goHome() {
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = 'none'; });
   document.getElementById('materialView').style.display = 'none';
   document.getElementById('materialsSectionView').style.display = 'none';
-  document.getElementById('quickaddFormView').style.display = 'none';
   document.getElementById('homeView').style.display = 'block';
 }
 
@@ -484,24 +457,6 @@ function resetImageUI(){clearImageUI('matImageData','matImage','imgPreview','img
 function showAddMaterialModal(){document.getElementById('materialModalTitle').textContent='إضافة مادة جديدة';document.getElementById('materialModalBtn').textContent='إضافة';document.getElementById('editMaterialId').value='';document.getElementById('matName').value='';document.getElementById('matPrice').value='';document.getElementById('matQty').value='';document.getElementById('matUnit').value='kg';document.getElementById('matPhone').value='';document.getElementById('matWebsite').value='';document.getElementById('matPlace').value='';resetImageUI();populateSectionSelect('matSection');if(activeManageSection)document.getElementById('matSection').value=activeManageSection;document.getElementById('materialModal').classList.add('show');}
 function showEditMaterial(id){const m=data.materials.find(x=>x.id===id);if(!m)return;document.getElementById('materialModalTitle').textContent='تعديل مادة';document.getElementById('materialModalBtn').textContent='حفظ';document.getElementById('editMaterialId').value=id;populateSectionSelect('matSection');document.getElementById('matSection').value=m.section;document.getElementById('matName').value=m.name;document.getElementById('matPrice').value=m.price||'';document.getElementById('matQty').value=m.qty||'';document.getElementById('matUnit').value=m.unit;document.getElementById('matPhone').value=m.phone||'';document.getElementById('matWebsite').value=m.website||'';document.getElementById('matPlace').value=m.place||'';if(m.image)setImageUI('matImageData','imgPreview','imgPlaceholder','imgRemoveBtn',m.image);else resetImageUI();document.getElementById('materialModal').classList.add('show');}
 function saveMaterial(){const sec=document.getElementById('matSection').value,n=document.getElementById('matName').value.trim(),pr=parseFloat(document.getElementById('matPrice').value)||0,q=parseFloat(document.getElementById('matQty').value)||0,u=document.getElementById('matUnit').value,img=document.getElementById('matImageData').value||'',ph=document.getElementById('matPhone').value.trim(),ws=document.getElementById('matWebsite').value.trim(),pl=document.getElementById('matPlace').value.trim(),eid=document.getElementById('editMaterialId').value;if(!sec){showToast('اختر القسم',true);return;}if(!n){showToast('أدخل اسم المادة',true);return;}if(eid){const m=data.materials.find(x=>x.id===parseInt(eid));if(m){m.section=sec;m.name=n;m.price=pr;m.qty=q;m.unit=u;m.image=img;m.phone=ph;m.website=ws;m.place=pl;}showToast('تم التعديل');}else{data.materials.push({id:data.nextId++,section:sec,name:n,price:pr,qty:q,unit:u,image:img,phone:ph,website:ws,place:pl});showToast('تم الإضافة');}saveData();closeModal('materialModal');activeManageSection=sec;if(document.getElementById('materialsSectionView').style.display!=='none')renderMaterials();if(activeMaterialId){const cur=data.materials.find(x=>x.id===activeMaterialId);if(cur)renderMaterialViewContent(cur);}}
-
-// ── Quick Add ──
-let quickaddSection = null;
-function renderQuickaddSections(){document.getElementById('quickaddSections').innerHTML=data.sections.map((s,i)=>`<button class="home-btn mcolor-${i%6}" onclick="quickaddPick('${s}')"><span class="home-btn-icon">${sectionIcon(s)}</span><span class="home-btn-label">${s}</span></button>`).join('');}
-function quickaddPick(section){quickaddSection=section;document.getElementById('quickaddView').style.display='none';document.getElementById('quickaddFormView').style.display='block';document.getElementById('quickaddSectionTitle').textContent=section;document.getElementById('qaName').value='';document.getElementById('qaPrice').value='';document.getElementById('qaPlace').value='';document.getElementById('qaPhone').value='';resetQaImageUI();}
-function backToQuickaddSections(){document.getElementById('quickaddFormView').style.display='none';document.getElementById('quickaddView').style.display='block';}
-function handleQaImageUpload(e){const f=e.target.files[0];if(!f)return;resizeImage(f,d=>setImageUI('qaImageData','qaImgPreview','qaImgPlaceholder','qaImgRemoveBtn',d));}
-function removeQaImage(e){e.stopPropagation();clearImageUI('qaImageData','qaImage','qaImgPreview','qaImgPlaceholder','qaImgRemoveBtn');}
-function resetQaImageUI(){clearImageUI('qaImageData','qaImage','qaImgPreview','qaImgPlaceholder','qaImgRemoveBtn');}
-function saveQuickadd(){
-  const n=document.getElementById('qaName').value.trim();
-  if(!n){showToast('أدخل اسم السلعة',true);return;}
-  const pr=parseFloat(document.getElementById('qaPrice').value)||0,pl=document.getElementById('qaPlace').value.trim(),ph=document.getElementById('qaPhone').value.trim(),img=document.getElementById('qaImageData').value||'';
-  data.materials.push({id:data.nextId++,section:quickaddSection,name:n,price:pr,qty:pr>0?1:0,unit:'kg',image:img,phone:ph,website:'',place:pl});
-  saveData();
-  showToast('تم حفظ السلعة');
-  goHome();
-}
 
 // ── Supplier Info ──
 function openImageZoom(src){
