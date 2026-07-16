@@ -62,8 +62,8 @@ option { background: #0f172a; }
 .material-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #0f172a; border-radius: 10px; margin-bottom: 8px; border: 1px solid #334155; transition: border-color 0.2s; gap: 12px; }
 .material-item:hover { border-color: #475569; }
 .material-img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 2px solid #334155; flex-shrink: 0; cursor: zoom-in; }
-.image-zoom-content { position: relative; max-width: 92vw; max-height: 92vh; }
-.image-zoom-content img { max-width: 92vw; max-height: 92vh; border-radius: 14px; display: block; object-fit: contain; }
+.image-zoom-content { position: relative; width: 92vw; height: 92vh; display: flex; align-items: center; justify-content: center; }
+.image-zoom-content img { width: 100%; height: 100%; border-radius: 14px; display: block; object-fit: contain; }
 .image-zoom-close { position: absolute; top: -16px; right: -16px; width: 36px; height: 36px; border-radius: 50%; background: #ef4444; color: #fff; border: none; font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
 .material-img-placeholder { width: 52px; height: 52px; border-radius: 10px; border: 2px dashed #475569; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 22px; flex-shrink: 0; }
 .material-info { flex: 1; min-width: 0; }
@@ -338,7 +338,7 @@ function loadData() {
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   fetch(FIREBASE_URL + '/material_cost_data.json', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }).catch(()=>{});
 }
 function syncFromFirebase() {
@@ -347,7 +347,7 @@ function syncFromFirebase() {
     .then(remote => {
       if (remote) {
         data = remote;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
         refreshCurrentView();
       } else {
         saveData();
@@ -447,7 +447,7 @@ function showDeletePkg(id){const p=data.packaging.find(x=>x.id===id);if(!p)retur
 
 // ── Material Modals ──
 function populateSectionSelect(id){const s=document.getElementById(id);s.innerHTML='<option value="">-- اختر --</option>';data.sections.forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`);}
-function resizeImage(file,cb){const r=new FileReader();r.onload=function(ev){const img=new Image();img.onload=function(){const c=document.createElement('canvas'),mx=200;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.7));};img.src=ev.target.result;};r.readAsDataURL(file);}
+function resizeImage(file,cb){const r=new FileReader();r.onload=function(ev){const img=new Image();img.onload=function(){const c=document.createElement('canvas'),mx=500;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.75));};img.src=ev.target.result;};r.readAsDataURL(file);}
 function setImageUI(dataId,previewId,placeholderId,removeBtnId,dataUrl){document.getElementById(dataId).value=dataUrl;const p=document.getElementById(previewId);p.src=dataUrl;p.style.display='block';document.getElementById(placeholderId).style.display='none';document.getElementById(removeBtnId).style.display='inline-block';}
 function clearImageUI(dataId,fileId,previewId,placeholderId,removeBtnId){document.getElementById(dataId).value='';document.getElementById(fileId).value='';document.getElementById(previewId).style.display='none';document.getElementById(placeholderId).style.display='block';document.getElementById(removeBtnId).style.display='none';}
 
