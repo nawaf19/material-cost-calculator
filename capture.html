@@ -125,8 +125,7 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="shop-badge" id="shopNameDisplay" style="display:none;"></div>
       <div class="form-group" id="qaLinkGroup"><label>رابط المنتج (اختياري)</label><div style="display:flex;gap:8px;"><input type="url" id="qaLink" placeholder="https://..." dir="ltr" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="openQaLink()" style="flex-shrink:0;white-space:nowrap;">&#128279; فتح</button></div></div>
       <div class="form-group"><label>صورة السلعة</label><div class="img-upload-area" onclick="document.getElementById('qaImage').click()"><div class="upload-text" id="qaImgPlaceholder">اضغط للتصوير أو اختيار صورة</div><img id="qaImgPreview" style="display:none;"><input type="file" id="qaImage" accept="image/*" capture="environment" onchange="handleQaImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="qaImgRemoveBtn" style="display:none;" onclick="removeQaImage(event)">حذف الصورة</button><input type="hidden" id="qaImageData" value=""></div>
-      <div class="form-group"><label>اسم السلعة</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
-      <div class="form-group"><label>رقم الكاتالوج أو الكود</label><input type="text" id="qaCatalog" placeholder="مثال: SC-104" dir="ltr"></div>
+      <div class="form-group"><label>اسم السلعة (اختياري، افتراضيًا اسم القسم)</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
       <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="qaPhone" placeholder="96512345678" dir="ltr"></div>
       <div class="form-group"><label>ملاحظات (اختياري)</label><textarea id="qaNotes" placeholder="أي ملاحظات إضافية..."></textarea></div>
       <button class="btn btn-success" onclick="saveQuickadd()">&#128190; حفظ السلعة</button>
@@ -277,21 +276,19 @@ function openQaLink(){
 function saveQuickadd(){
   const sec = document.getElementById('sectionSelect').value;
   if (!sec) { showToast('اختر القسم أولاً', true); return; }
-  const n=document.getElementById('qaName').value.trim();
-  if(!n){showToast('أدخل اسم السلعة',true);return;}
+  const n=document.getElementById('qaName').value.trim() || sec;
   let link='';
   if (flowMode === 'web') {
     link = document.getElementById('qaLink').value.trim();
     if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
   }
   const place = flowMode === 'field' ? fieldShopName : '';
-  const cat=document.getElementById('qaCatalog').value.trim(),ph=document.getElementById('qaPhone').value.trim(),notes=document.getElementById('qaNotes').value.trim(),img=document.getElementById('qaImageData').value||'';
-  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:link,place:place,catalog:cat,notes:notes});
+  const ph=document.getElementById('qaPhone').value.trim(),notes=document.getElementById('qaNotes').value.trim(),img=document.getElementById('qaImageData').value||'';
+  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:link,place:place,catalog:'',notes:notes});
   saveData();
   showToast('تم حفظ السلعة');
   document.getElementById('qaName').value='';
   document.getElementById('qaLink').value='';
-  document.getElementById('qaCatalog').value='';
   document.getElementById('qaPhone').value='';
   document.getElementById('qaNotes').value='';
   resetQaImageUI();
