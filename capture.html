@@ -11,8 +11,23 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: 
 h1 { text-align: center; font-size: 24px; padding: 24px 0; color: #38bdf8; border-bottom: 2px solid #1e293b; margin-bottom: 24px; }
 .home-link { display: block; text-align: center; color: #64748b; font-size: 13px; margin-top: -14px; margin-bottom: 24px; text-decoration: none; }
 .home-link:hover { color: #38bdf8; }
+.home-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.home-btn { display: flex; align-items: center; gap: 18px; padding: 24px 22px; border: none; border-radius: 16px; cursor: pointer; font-family: inherit; color: #fff; text-align: right; transition: transform 0.15s; font-size: inherit; }
+.home-btn:hover { transform: translateY(-2px); }
+.home-btn-icon { font-size: 34px; flex-shrink: 0; }
+.home-btn-label { font-size: 18px; font-weight: 700; }
+.home-btn-sub { font-size: 12px; font-weight: 500; opacity: 0.85; margin-top: 2px; }
+.mcolor-0 { background: linear-gradient(135deg, #38bdf8, #0ea5e9); }
+.mcolor-1 { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.mcolor-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.mcolor-3 { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+.mcolor-4 { background: linear-gradient(135deg, #f472b6, #db2777); }
+.mcolor-5 { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+.back-btn { background: none; border: none; color: #38bdf8; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 0 18px; display: flex; align-items: center; gap: 6px; }
+.back-btn:hover { text-decoration: underline; }
 .card { background: #1e293b; border-radius: 14px; padding: 24px; margin-bottom: 20px; border: 1px solid #334155; }
 .card h2 { font-size: 18px; margin-bottom: 16px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+.shop-badge { display: inline-flex; align-items: center; gap: 6px; background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 13px; padding: 8px 12px; border-radius: 10px; margin-bottom: 16px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 label { font-size: 14px; color: #94a3b8; }
 input, select, textarea { padding: 12px 14px; background: #0f172a; border: 2px solid #334155; border-radius: 10px; color: #e2e8f0; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.2s; width: 100%; }
@@ -68,27 +83,54 @@ textarea { resize: vertical; min-height: 70px; }
   <h1>&#128248; تسجيل سلعة</h1>
   <a class="home-link" href="index.html">&#8592; الموقع الرئيسي</a>
 
-  <div class="card">
-    <h2>&#128193; اختر القسم</h2>
-    <div class="form-group">
-      <select id="sectionSelect" onchange="onSectionChange()"><option value="">-- اختر القسم --</option></select>
-    </div>
-    <button class="new-section-btn" onclick="toggleNewSectionForm()">&#10133; إنشاء قسم جديد</button>
-    <div class="new-section-form" id="newSectionForm">
-      <div class="form-group"><label>اسم القسم</label><input type="text" id="newSectionName" placeholder="مثال: الجزئيات"></div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="saveNewSection()">حفظ القسم</button><button class="btn btn-secondary" onclick="toggleNewSectionForm()">إلغاء</button></div>
+  <!-- Landing: choose flow -->
+  <div id="landingView">
+    <div class="card">
+      <h2>وش تبي تسوي؟</h2>
+      <div class="home-grid">
+        <button class="home-btn mcolor-0" onclick="startFieldFlow()"><span class="home-btn-icon">&#128205;</span><span><span class="home-btn-label">جمع بيانات ميدانية</span><br><span class="home-btn-sub">تصوير سلع من محل حقيقي</span></span></button>
+        <button class="home-btn mcolor-3" onclick="startWebFlow()"><span class="home-btn-icon">&#127760;</span><span><span class="home-btn-label">جمع بيانات من المواقع</span><br><span class="home-btn-sub">سلعة من موقع إلكتروني</span></span></button>
+      </div>
     </div>
   </div>
 
-  <div class="card" id="itemFormCard" style="display:none;">
-    <h2 id="itemFormTitle"></h2>
-    <div class="form-group"><label>رابط المنتج (اختياري)</label><div style="display:flex;gap:8px;"><input type="url" id="qaLink" placeholder="https://..." dir="ltr" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="openQaLink()" style="flex-shrink:0;white-space:nowrap;">&#128279; فتح</button></div></div>
-    <div class="form-group"><label>صورة السلعة</label><div class="img-upload-area" onclick="document.getElementById('qaImage').click()"><div class="upload-text" id="qaImgPlaceholder">اضغط للتصوير أو اختيار صورة</div><img id="qaImgPreview" style="display:none;"><input type="file" id="qaImage" accept="image/*" capture="environment" onchange="handleQaImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="qaImgRemoveBtn" style="display:none;" onclick="removeQaImage(event)">حذف الصورة</button><input type="hidden" id="qaImageData" value=""></div>
-    <div class="form-group"><label>اسم السلعة</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
-    <div class="form-group"><label>رقم الكاتالوج أو الكود</label><input type="text" id="qaCatalog" placeholder="مثال: SC-104" dir="ltr"></div>
-    <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="qaPhone" placeholder="96512345678" dir="ltr"></div>
-    <div class="form-group"><label>ملاحظات (اختياري)</label><textarea id="qaNotes" placeholder="أي ملاحظات إضافية..."></textarea></div>
-    <button class="btn btn-success" onclick="saveQuickadd()">&#128190; حفظ السلعة</button>
+  <!-- Field flow: enter shop name first -->
+  <div id="fieldShopView" style="display:none;">
+    <button class="back-btn" onclick="backToLanding()">&#8592; رجوع</button>
+    <div class="card">
+      <h2>&#128205; جمع بيانات ميدانية</h2>
+      <div class="form-group"><label>اسم المحل</label><input type="text" id="shopNameInput" placeholder="مثال: محل الحرفي"></div>
+      <button class="btn btn-success" onclick="continueFieldFlow()">متابعة</button>
+    </div>
+  </div>
+
+  <!-- Shared: pick section + item form -->
+  <div id="collectView" style="display:none;">
+    <button class="back-btn" onclick="backFromCollect()">&#8592; رجوع</button>
+
+    <div class="card">
+      <h2>&#128193; اختر القسم</h2>
+      <div class="form-group">
+        <select id="sectionSelect" onchange="onSectionChange()"><option value="">-- اختر القسم --</option></select>
+      </div>
+      <button class="new-section-btn" onclick="toggleNewSectionForm()">&#10133; إنشاء قسم جديد</button>
+      <div class="new-section-form" id="newSectionForm">
+        <div class="form-group"><label>اسم القسم</label><input type="text" id="newSectionName" placeholder="مثال: الجزئيات"></div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="saveNewSection()">حفظ القسم</button><button class="btn btn-secondary" onclick="toggleNewSectionForm()">إلغاء</button></div>
+      </div>
+    </div>
+
+    <div class="card" id="itemFormCard" style="display:none;">
+      <h2 id="itemFormTitle"></h2>
+      <div class="shop-badge" id="shopNameDisplay" style="display:none;"></div>
+      <div class="form-group" id="qaLinkGroup"><label>رابط المنتج (اختياري)</label><div style="display:flex;gap:8px;"><input type="url" id="qaLink" placeholder="https://..." dir="ltr" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="openQaLink()" style="flex-shrink:0;white-space:nowrap;">&#128279; فتح</button></div></div>
+      <div class="form-group"><label>صورة السلعة</label><div class="img-upload-area" onclick="document.getElementById('qaImage').click()"><div class="upload-text" id="qaImgPlaceholder">اضغط للتصوير أو اختيار صورة</div><img id="qaImgPreview" style="display:none;"><input type="file" id="qaImage" accept="image/*" capture="environment" onchange="handleQaImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="qaImgRemoveBtn" style="display:none;" onclick="removeQaImage(event)">حذف الصورة</button><input type="hidden" id="qaImageData" value=""></div>
+      <div class="form-group"><label>اسم السلعة</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
+      <div class="form-group"><label>رقم الكاتالوج أو الكود</label><input type="text" id="qaCatalog" placeholder="مثال: SC-104" dir="ltr"></div>
+      <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="qaPhone" placeholder="96512345678" dir="ltr"></div>
+      <div class="form-group"><label>ملاحظات (اختياري)</label><textarea id="qaNotes" placeholder="أي ملاحظات إضافية..."></textarea></div>
+      <button class="btn btn-success" onclick="saveQuickadd()">&#128190; حفظ السلعة</button>
+    </div>
   </div>
 </div>
 
@@ -122,6 +164,8 @@ const FIREBASE_URL = 'https://nawwaf2-66f3c-default-rtdb.firebaseio.com';
 function showToast(msg, err) { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',2500); }
 
 let data = null;
+let flowMode = null; // 'field' | 'web'
+let fieldShopName = '';
 
 function loadLocalData() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -141,6 +185,46 @@ function fetchData() {
 function saveData() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   fetch(FIREBASE_URL + '/material_cost_data.json', { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) }).catch(()=>{});
+}
+
+// ── Flow navigation ──
+function startFieldFlow(){
+  flowMode = 'field';
+  document.getElementById('shopNameInput').value = '';
+  document.getElementById('landingView').style.display = 'none';
+  document.getElementById('fieldShopView').style.display = 'block';
+}
+function startWebFlow(){
+  flowMode = 'web';
+  fieldShopName = '';
+  document.getElementById('landingView').style.display = 'none';
+  showCollectView();
+}
+function continueFieldFlow(){
+  const n = document.getElementById('shopNameInput').value.trim();
+  if (!n) { showToast('أدخل اسم المحل', true); return; }
+  fieldShopName = n;
+  document.getElementById('fieldShopView').style.display = 'none';
+  showCollectView();
+}
+function backToLanding(){
+  document.getElementById('fieldShopView').style.display = 'none';
+  document.getElementById('collectView').style.display = 'none';
+  document.getElementById('landingView').style.display = 'block';
+}
+function backFromCollect(){
+  document.getElementById('collectView').style.display = 'none';
+  if (flowMode === 'field') document.getElementById('fieldShopView').style.display = 'block';
+  else document.getElementById('landingView').style.display = 'block';
+}
+function showCollectView(){
+  document.getElementById('sectionSelect').value = '';
+  document.getElementById('itemFormCard').style.display = 'none';
+  document.getElementById('qaLinkGroup').style.display = flowMode === 'web' ? 'block' : 'none';
+  const badge = document.getElementById('shopNameDisplay');
+  if (flowMode === 'field') { badge.style.display = 'inline-flex'; badge.textContent = '\u{1F4CD} ' + fieldShopName; }
+  else badge.style.display = 'none';
+  document.getElementById('collectView').style.display = 'block';
 }
 
 function populateSectionSelect(){
@@ -195,10 +279,14 @@ function saveQuickadd(){
   if (!sec) { showToast('اختر القسم أولاً', true); return; }
   const n=document.getElementById('qaName').value.trim();
   if(!n){showToast('أدخل اسم السلعة',true);return;}
-  let link=document.getElementById('qaLink').value.trim();
-  if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  let link='';
+  if (flowMode === 'web') {
+    link = document.getElementById('qaLink').value.trim();
+    if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  }
+  const place = flowMode === 'field' ? fieldShopName : '';
   const cat=document.getElementById('qaCatalog').value.trim(),ph=document.getElementById('qaPhone').value.trim(),notes=document.getElementById('qaNotes').value.trim(),img=document.getElementById('qaImageData').value||'';
-  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:link,place:'',catalog:cat,notes:notes});
+  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:link,place:place,catalog:cat,notes:notes});
   saveData();
   showToast('تم حفظ السلعة');
   document.getElementById('qaName').value='';
