@@ -82,6 +82,7 @@ textarea { resize: vertical; min-height: 70px; }
 
   <div class="card" id="itemFormCard" style="display:none;">
     <h2 id="itemFormTitle"></h2>
+    <div class="form-group"><label>رابط المنتج (اختياري)</label><div style="display:flex;gap:8px;"><input type="url" id="qaLink" placeholder="https://..." dir="ltr" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="openQaLink()" style="flex-shrink:0;white-space:nowrap;">&#128279; فتح</button></div></div>
     <div class="form-group"><label>صورة السلعة</label><div class="img-upload-area" onclick="document.getElementById('qaImage').click()"><div class="upload-text" id="qaImgPlaceholder">اضغط للتصوير أو اختيار صورة</div><img id="qaImgPreview" style="display:none;"><input type="file" id="qaImage" accept="image/*" capture="environment" onchange="handleQaImageUpload(event)" style="display:none;"></div><button class="img-remove-btn" id="qaImgRemoveBtn" style="display:none;" onclick="removeQaImage(event)">حذف الصورة</button><input type="hidden" id="qaImageData" value=""></div>
     <div class="form-group"><label>اسم السلعة</label><input type="text" id="qaName" placeholder="مثال: قالب سيليكون دائري"></div>
     <div class="form-group"><label>رقم الكاتالوج أو الكود</label><input type="text" id="qaCatalog" placeholder="مثال: SC-104" dir="ltr"></div>
@@ -182,16 +183,26 @@ function handleQaImageUpload(e){const f=e.target.files[0];if(!f)return;resizeIma
 function removeQaImage(e){e.stopPropagation();clearImageUI('qaImageData','qaImage','qaImgPreview','qaImgPlaceholder','qaImgRemoveBtn');}
 function resetQaImageUI(){clearImageUI('qaImageData','qaImage','qaImgPreview','qaImgPlaceholder','qaImgRemoveBtn');}
 
+function openQaLink(){
+  let url = document.getElementById('qaLink').value.trim();
+  if(!url){ showToast('أدخل الرابط أولاً', true); return; }
+  if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  window.open(url, '_blank');
+}
+
 function saveQuickadd(){
   const sec = document.getElementById('sectionSelect').value;
   if (!sec) { showToast('اختر القسم أولاً', true); return; }
   const n=document.getElementById('qaName').value.trim();
   if(!n){showToast('أدخل اسم السلعة',true);return;}
+  let link=document.getElementById('qaLink').value.trim();
+  if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
   const cat=document.getElementById('qaCatalog').value.trim(),ph=document.getElementById('qaPhone').value.trim(),notes=document.getElementById('qaNotes').value.trim(),img=document.getElementById('qaImageData').value||'';
-  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:'',place:'',catalog:cat,notes:notes});
+  data.materials.push({id:data.nextId++,section:sec,name:n,price:0,qty:0,unit:'kg',image:img,phone:ph,website:link,place:'',catalog:cat,notes:notes});
   saveData();
   showToast('تم حفظ السلعة');
   document.getElementById('qaName').value='';
+  document.getElementById('qaLink').value='';
   document.getElementById('qaCatalog').value='';
   document.getElementById('qaPhone').value='';
   document.getElementById('qaNotes').value='';
