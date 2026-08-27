@@ -11,17 +11,43 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; direction: rtl; position: relative; overflow-x: hidden; }
 .bg-blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.bg-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.32; will-change: transform; }
+.bg-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.2; will-change: transform; }
 .bg-blob-1 { width: 420px; height: 420px; background: #38bdf8; top: -120px; right: -100px; animation: blobFloat1 20s ease-in-out infinite; }
 .bg-blob-2 { width: 380px; height: 380px; background: #22c55e; bottom: -140px; left: -110px; animation: blobFloat2 24s ease-in-out infinite; }
 .bg-blob-3 { width: 320px; height: 320px; background: #a78bfa; top: 45%; left: 55%; animation: blobFloat3 28s ease-in-out infinite; }
 @keyframes blobFloat1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-50px,70px) scale(1.15);} }
 @keyframes blobFloat2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(60px,-50px) scale(1.1);} }
 @keyframes blobFloat3 { 0%,100%{transform:translate(-50%,-50%) scale(1);} 50%{transform:translate(-55%,-45%) scale(1.2);} }
+/* ── Floating chemistry/math symbols ── */
+.bg-symbols { position: absolute; inset: 0; }
+.bg-sym { position: absolute; bottom: -60px; font-weight: 800; line-height: 1; opacity: 0; user-select: none; will-change: transform, opacity; animation: symFloat linear infinite; }
+@keyframes symFloat {
+  0% { transform: translate(0,0) rotate(0deg); opacity: 0; }
+  10% { opacity: var(--peak,0.24); }
+  50% { transform: translate(var(--drift,20px),-58vh) rotate(180deg); }
+  90% { opacity: var(--peak,0.24); }
+  100% { transform: translate(calc(var(--drift,20px) * -1),-116vh) rotate(360deg); opacity: 0; }
+}
+.bg-sym.s1  { left:4%;  font-size:30px; color:#38bdf8; --drift:24px;  --peak:.22; animation-duration:26s; animation-delay:-4s; }
+.bg-sym.s2  { left:14%; font-size:32px; color:#f59e0b; --drift:-18px; --peak:.26; animation-duration:22s; animation-delay:-11s; }
+.bg-sym.s3  { left:24%; font-size:26px; color:#a78bfa; --drift:16px;  --peak:.22; animation-duration:30s; animation-delay:-6s; }
+.bg-sym.s4  { left:33%; font-size:28px; --drift:-22px; --peak:.24; animation-duration:24s; animation-delay:-16s; }
+.bg-sym.s5  { left:42%; font-size:24px; color:#22c55e; --drift:20px;  --peak:.24; animation-duration:28s; animation-delay:-2s; }
+.bg-sym.s6  { left:50%; font-size:20px; color:#2dd4bf; --drift:-14px; --peak:.22; animation-duration:32s; animation-delay:-20s; }
+.bg-sym.s7  { left:58%; font-size:30px; --drift:18px;  --peak:.22; animation-duration:20s; animation-delay:-9s; }
+.bg-sym.s8  { left:66%; font-size:26px; color:#f472b6; --drift:-20px; --peak:.24; animation-duration:26s; animation-delay:-14s; }
+.bg-sym.s9  { left:74%; font-size:32px; color:#38bdf8; --drift:22px;  --peak:.2;  animation-duration:23s; animation-delay:-3s; }
+.bg-sym.s10 { left:82%; font-size:24px; color:#a78bfa; --drift:-16px; --peak:.24; animation-duration:29s; animation-delay:-18s; }
+.bg-sym.s11 { left:90%; font-size:28px; --drift:20px;  --peak:.22; animation-duration:25s; animation-delay:-7s; }
+.bg-sym.s12 { left:96%; font-size:20px; color:#f59e0b; --drift:-18px; --peak:.24; animation-duration:31s; animation-delay:-22s; }
+.bg-sym.s13 { left:9%;  font-size:26px; color:#2dd4bf; --drift:16px;  --peak:.2;  animation-duration:27s; animation-delay:-13s; }
+.bg-sym.s14 { left:47%; font-size:26px; --drift:-20px; --peak:.22; animation-duration:21s; animation-delay:-5s; }
+.bg-sym.s15 { left:63%; font-size:19px; color:#22c55e; --drift:18px;  --peak:.22; animation-duration:33s; animation-delay:-25s; }
+.bg-sym.s16 { left:78%; font-size:24px; --drift:-16px; --peak:.22; animation-duration:24s; animation-delay:-10s; }
 @keyframes fadeSlideIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 @keyframes popIn { from{opacity:0; transform:scale(0.93);} to{opacity:1; transform:scale(1);} }
 @media (prefers-reduced-motion: reduce) {
-  .bg-blob { animation: none; }
+  .bg-blob, .bg-sym { animation: none; opacity: 0; }
   .card, .modal, .toast.show { animation: none !important; }
 }
 .app { max-width: 960px; margin: 0 auto; padding: 20px; }
@@ -196,7 +222,27 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
 </style>
 </head>
 <body>
-<div class="bg-blobs" aria-hidden="true"><div class="bg-blob bg-blob-1"></div><div class="bg-blob bg-blob-2"></div><div class="bg-blob bg-blob-3"></div></div>
+<div class="bg-blobs" aria-hidden="true">
+  <div class="bg-blob bg-blob-1"></div><div class="bg-blob bg-blob-2"></div><div class="bg-blob bg-blob-3"></div>
+  <div class="bg-symbols">
+    <span class="bg-sym s1">&#9879;&#65039;</span>
+    <span class="bg-sym s2">%</span>
+    <span class="bg-sym s3">&#960;</span>
+    <span class="bg-sym s4">&#129514;</span>
+    <span class="bg-sym s5">&#916;</span>
+    <span class="bg-sym s6">H&#8322;O</span>
+    <span class="bg-sym s7">&#9883;&#65039;</span>
+    <span class="bg-sym s8">&#8730;</span>
+    <span class="bg-sym s9">&#8721;</span>
+    <span class="bg-sym s10">&#11041;</span>
+    <span class="bg-sym s11">&#129516;</span>
+    <span class="bg-sym s12">&#177;</span>
+    <span class="bg-sym s13">&#8734;</span>
+    <span class="bg-sym s14">&#128300;</span>
+    <span class="bg-sym s15">CO&#8322;</span>
+    <span class="bg-sym s16">&#9878;&#65039;</span>
+  </div>
+</div>
 <div class="auth-gate" id="authGate">
   <div class="auth-box" id="authBox">
     <div class="auth-icon">&#128274;</div>
