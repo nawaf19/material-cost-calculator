@@ -160,6 +160,24 @@ option { background: #0f172a; }
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.error { background: #ef4444; }
 
+/* ── Quantities / Mix Ratio ── */
+.home-btn-teal { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+.ratio-pill { display: inline-flex; align-items: center; gap: 6px; background: #0f172a; border: 1px solid #334155; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #38bdf8; font-weight: 700; white-space: nowrap; }
+.qty-slider-group { margin-bottom: 26px; }
+.qty-slider-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.qty-slider-label { font-size: 15px; color: #94a3b8; font-weight: 600; }
+.qty-slider-value { display: flex; align-items: center; gap: 6px; }
+.qty-slider-value input[type=number] { width: 108px; text-align: center; padding: 8px 4px; font-size: 16px; font-weight: 700; direction: ltr; }
+.qty-slider-unit { font-size: 13px; color: #64748b; }
+input[type=range].qty-range { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 6px; background: #1e293b; outline: none; border: 1px solid #334155; direction: ltr; }
+input[type=range].qty-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,#38bdf8,#0ea5e9); border: 3px solid #0f172a; box-shadow: 0 2px 8px rgba(0,0,0,0.45); cursor: pointer; }
+input[type=range].qty-range::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,#38bdf8,#0ea5e9); border: 3px solid #0f172a; cursor: pointer; }
+input[type=range].qty-range.hardener::-webkit-slider-thumb { background: linear-gradient(135deg,#f59e0b,#d97706); }
+input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-gradient(135deg,#f59e0b,#d97706); }
+.qty-total-box { background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(167,139,250,0.12)); border: 2px solid #334155; border-radius: 14px; padding: 18px 20px; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+.qty-total-label { font-size: 15px; color: #94a3b8; font-weight: 600; }
+.qty-total-value { font-size: 24px; font-weight: 800; color: #fff; }
+
 /* ── Auth Gate ── */
 .auth-gate { position: fixed; inset: 0; background: rgba(15,23,42,0.88); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .auth-box { background: rgba(30,41,59,0.95); backdrop-filter: blur(6px); border: 1px solid #334155; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,0.5); animation: popIn 0.35s ease; }
@@ -196,6 +214,7 @@ option { background: #0f172a; }
       <button class="home-btn home-btn-blue" onclick="showView('calculate')"><span class="home-btn-icon">&#129518;</span><span class="home-btn-label">حساب التكلفة</span></button>
       <button class="home-btn home-btn-green" onclick="showView('manage')"><span class="home-btn-icon">&#129521;</span><span class="home-btn-label">إدارة المواد</span></button>
       <button class="home-btn home-btn-orange" onclick="showView('packaging')"><span class="home-btn-icon">&#128230;</span><span class="home-btn-label">إدارة التغليف</span></button>
+      <button class="home-btn home-btn-teal" onclick="showView('quantities')"><span class="home-btn-icon">&#9878;&#65039;</span><span class="home-btn-label">حساب الكميات</span></button>
       <a class="home-btn mcolor-3" href="capture.html"><span class="home-btn-icon">&#128248;</span><span class="home-btn-label">تسجيل سلعة</span></a>
     </div>
   </div>
@@ -247,6 +266,22 @@ option { background: #0f172a; }
     </div>
   </div>
 
+  <!-- Quantities (Mix Ratio) Home View -->
+  <div id="quantitiesView" style="display:none;">
+    <button class="back-btn" onclick="goHome()">&#127968; الرئيسية</button>
+    <div class="card">
+      <h2>&#9878;&#65039; حساب الكميات</h2>
+      <p style="color:#64748b;font-size:14px;margin-bottom:16px;">أضف المواد اللي تحتاج نسبة مصلب (سيليكون، رزن، جبس، شموع، عطور...) وحدد نسبتها مرة وحدة، وبعدها احسب أي كمية تبيها بسحب السلايدر.</p>
+      <div class="home-grid" id="mixHomeGrid"></div>
+    </div>
+  </div>
+
+  <!-- Quantities Calculator View -->
+  <div id="quantitiesCalcView" style="display:none;">
+    <button class="back-btn" onclick="backToQuantities()">&#8592; رجوع</button>
+    <div class="card" id="quantitiesCalcContent"></div>
+  </div>
+
   <!-- Material Detail View -->
   <div id="materialView" style="display:none;">
     <button class="back-btn" onclick="backToMaterials()">&#8592; رجوع</button>
@@ -263,6 +298,8 @@ option { background: #0f172a; }
 
 <div class="modal-overlay" id="pkgModal"><div class="modal"><h3 id="pkgModalTitle">إضافة مادة تغليف</h3><div class="form-group" style="margin-bottom:12px;"><label>اسم مادة التغليف</label><input type="text" id="pkgName" placeholder="مثال: علبة كرتون"></div><div class="form-group" style="margin-bottom:12px;"><label>سعر القطعة الواحدة (د.ك)</label><input type="number" id="pkgPrice" placeholder="مثال: 0.250" min="0" step="any"></div><input type="hidden" id="editPkgId" value=""><div class="btn-row" style="margin-top:16px;"><button class="btn btn-primary" id="pkgModalBtn" onclick="savePkgMaterial()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('pkgModal')">إلغاء</button></div></div></div>
 
+
+<div class="modal-overlay" id="mixModal"><div class="modal"><h3 id="mixModalTitle">إضافة مادة خلط</h3><div class="form-group" style="margin-bottom:18px;"><label>اسم المادة</label><input type="text" id="mixName" placeholder="مثال: سيليكون RTV-2"></div><div class="form-group"><label>نسبة المصلب — <span id="mixRatioLive" style="color:#38bdf8;font-weight:700;">10%</span></label><input type="range" class="qty-range" id="mixRatio" min="1" max="100" step="1" value="10" oninput="onMixRatioInput()"><div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-top:4px;"><span>1%</span><span>100% = خلط 1:1</span></div></div><input type="hidden" id="editMixId" value=""><div class="btn-row" style="margin-top:18px;"><button class="btn btn-primary" id="mixModalBtn" onclick="saveMixMaterial()">إضافة</button><button class="btn btn-secondary" onclick="closeModal('mixModal')">إلغاء</button></div></div></div>
 
 <div class="modal-overlay" id="imageZoomModal" style="z-index:300;"><div class="image-zoom-content"><button class="image-zoom-close" onclick="closeModal('imageZoomModal')">&times;</button><img id="zoomImg" src=""></div></div>
 
@@ -344,6 +381,8 @@ function loadData() {
     const d = JSON.parse(saved);
     if (!d.packaging) d.packaging = [];
     if (!d.nextPkgId) d.nextPkgId = 1;
+    if (!d.mixMaterials) d.mixMaterials = [];
+    if (!d.nextMixId) d.nextMixId = 1;
     return d;
   }
   return {
@@ -360,7 +399,8 @@ function loadData() {
       { id:9, section:'الفيلمنت', name:'TPU', price:0, qty:0, unit:'kg' },
     ],
     packaging: [],
-    nextId: 10, nextPkgId: 1
+    mixMaterials: [],
+    nextId: 10, nextPkgId: 1, nextMixId: 1
   };
 }
 
@@ -374,6 +414,10 @@ function syncFromFirebase() {
     .then(remote => {
       if (remote) {
         data = remote;
+        if (!data.packaging) data.packaging = [];
+        if (!data.nextPkgId) data.nextPkgId = 1;
+        if (!data.mixMaterials) data.mixMaterials = [];
+        if (!data.nextMixId) data.nextMixId = 1;
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
         refreshCurrentView();
       } else {
@@ -391,24 +435,33 @@ function refreshCurrentView() {
     const cur = data.materials.find(x => x.id === activeMaterialId);
     if (cur) renderMaterialViewContent(cur);
   }
+  if (document.getElementById('quantitiesView').style.display !== 'none') renderMixButtons();
+  if (document.getElementById('quantitiesCalcView').style.display !== 'none' && activeMixId) {
+    const curm = data.mixMaterials.find(x => x.id === activeMixId);
+    if (curm) renderMixCalc(curm); else backToQuantities();
+  }
 }
 function showToast(msg, err) { const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',2500); }
 
 // ── Views ──
-const views = ['calculate','manage','packaging'];
+const views = ['calculate','manage','packaging','quantities'];
 function showView(view) {
   document.getElementById('homeView').style.display = 'none';
   document.getElementById('materialView').style.display = 'none';
   document.getElementById('materialsSectionView').style.display = 'none';
+  document.getElementById('quantitiesCalcView').style.display = 'none';
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = v===view?'block':'none'; });
   if(view==='calculate'){refreshCalcSections();refreshPkgChecklist();}
   if(view==='manage')renderCategoryButtons();
   if(view==='packaging')renderPkgMaterials();
+  if(view==='quantities')renderMixButtons();
 }
 function goHome() {
   views.forEach(v => { const el=document.getElementById(v+'View'); if(el) el.style.display = 'none'; });
   document.getElementById('materialView').style.display = 'none';
   document.getElementById('materialsSectionView').style.display = 'none';
+  document.getElementById('quantitiesCalcView').style.display = 'none';
+  activeMixId = null;
   document.getElementById('homeView').style.display = 'block';
 }
 
@@ -472,6 +525,107 @@ function showEditPkg(id){const p=data.packaging.find(x=>x.id===id);if(!p)return;
 function savePkgMaterial(){const n=document.getElementById('pkgName').value.trim(),pr=parseFloat(document.getElementById('pkgPrice').value)||0,eid=document.getElementById('editPkgId').value;if(!n){showToast('أدخل اسم مادة التغليف',true);return;}if(eid){const p=data.packaging.find(x=>x.id===parseInt(eid));if(p){p.name=n;p.price=pr;}showToast('تم التعديل');}else{data.packaging.push({id:data.nextPkgId++,name:n,price:pr});showToast('تم الإضافة');}saveData();closeModal('pkgModal');renderPkgMaterials();}
 function showDeletePkg(id){const p=data.packaging.find(x=>x.id===id);if(!p)return;document.getElementById('deleteMsg').textContent=`حذف "${p.name}"؟`;document.getElementById('deleteId').value=id;document.getElementById('deleteType').value='packaging';document.getElementById('deleteModal').classList.add('show');}
 
+// ── Quantities / Mix Ratio ──
+let activeMixId = null;
+const MIX_ICONS = ['&#129514;','&#128167;','&#127993;','&#128367;&#65039;','&#127808;','&#10024;'];
+function renderMixButtons(){
+  const g = document.getElementById('mixHomeGrid');
+  let h = data.mixMaterials.map((m,i)=>`<button class="home-btn mcolor-${i%6}" onclick="openMixCalc(${m.id})"><span class="home-btn-icon">${MIX_ICONS[i%MIX_ICONS.length]}</span><span class="home-btn-label">${m.name}<br><span style="font-size:12px;font-weight:400;opacity:.85;">نسبة المصلب ${m.ratio}%</span></span></button>`).join('');
+  h += `<button class="home-btn home-btn-add" onclick="showAddMixModal()"><span class="home-btn-icon">&#10133;</span><span class="home-btn-label">إضافة مادة خلط</span></button>`;
+  g.innerHTML = h;
+}
+function onMixRatioInput(){ document.getElementById('mixRatioLive').textContent = document.getElementById('mixRatio').value + '%'; }
+function showAddMixModal(){
+  document.getElementById('mixModalTitle').textContent='إضافة مادة خلط';
+  document.getElementById('mixModalBtn').textContent='إضافة';
+  document.getElementById('editMixId').value='';
+  document.getElementById('mixName').value='';
+  document.getElementById('mixRatio').value=10;
+  document.getElementById('mixRatioLive').textContent='10%';
+  document.getElementById('mixModal').classList.add('show');
+}
+function showEditMix(id){
+  const m=data.mixMaterials.find(x=>x.id===id); if(!m) return;
+  document.getElementById('mixModalTitle').textContent='تعديل مادة خلط';
+  document.getElementById('mixModalBtn').textContent='حفظ';
+  document.getElementById('editMixId').value=id;
+  document.getElementById('mixName').value=m.name;
+  document.getElementById('mixRatio').value=m.ratio;
+  document.getElementById('mixRatioLive').textContent=m.ratio+'%';
+  document.getElementById('mixModal').classList.add('show');
+}
+function saveMixMaterial(){
+  const n=document.getElementById('mixName').value.trim(), r=parseInt(document.getElementById('mixRatio').value)||10, eid=document.getElementById('editMixId').value;
+  if(!n){showToast('أدخل اسم المادة',true);return;}
+  if(eid){ const m=data.mixMaterials.find(x=>x.id===parseInt(eid)); if(m){m.name=n;m.ratio=r;} showToast('تم التعديل'); }
+  else { data.mixMaterials.push({id:data.nextMixId++,name:n,ratio:r}); showToast('تم الإضافة'); }
+  saveData(); closeModal('mixModal'); renderMixButtons();
+  if(activeMixId){ const cur=data.mixMaterials.find(x=>x.id===activeMixId); if(cur && document.getElementById('quantitiesCalcView').style.display!=='none') renderMixCalc(cur); }
+}
+function showDeleteMix(id){
+  const m=data.mixMaterials.find(x=>x.id===id); if(!m) return;
+  document.getElementById('deleteMsg').textContent=`حذف "${m.name}"؟`;
+  document.getElementById('deleteId').value=id;
+  document.getElementById('deleteType').value='mix';
+  document.getElementById('deleteModal').classList.add('show');
+}
+function openMixCalc(id){
+  const m=data.mixMaterials.find(x=>x.id===id); if(!m) return;
+  activeMixId=id;
+  document.getElementById('quantitiesView').style.display='none';
+  document.getElementById('quantitiesCalcView').style.display='block';
+  renderMixCalc(m);
+}
+function backToQuantities(){
+  activeMixId=null;
+  document.getElementById('quantitiesCalcView').style.display='none';
+  document.getElementById('quantitiesView').style.display='block';
+  renderMixButtons();
+}
+function renderMixCalc(m){
+  const h = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:10px;"><h2 style="margin:0;">${m.name}</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span class="ratio-pill">نسبة المصلب ${m.ratio}%</span><button class="btn btn-warning btn-sm" onclick="showEditMix(${m.id})">تعديل</button><button class="btn btn-danger btn-sm" onclick="showDeleteMix(${m.id})">حذف</button></div></div>
+  <p style="color:#64748b;font-size:13px;margin-bottom:22px;">حرك سلايدر ${m.name} لتحديد الكمية، وبيظهر لك تلقائياً كم غرام تحتاج من المصلب. سلايدر المصلب على نفس مقياس السلايدر الأول (1000 جرام) عشان يبين لك حجمه الحقيقي، مو نفس موضع سلايدر ${m.name}.</p>
+  <div class="qty-slider-group">
+    <div class="qty-slider-head"><span class="qty-slider-label">&#129514; كمية ${m.name}</span><span class="qty-slider-value"><input type="number" id="mixBaseNum" lang="en" dir="ltr" min="1" max="1000" step="1" value="100" oninput="onBaseNumInput()"><span class="qty-slider-unit">جرام</span></span></div>
+    <input type="range" class="qty-range" id="mixBaseRange" min="1" max="1000" step="1" value="100" oninput="onBaseRangeInput()">
+  </div>
+  <div class="qty-slider-group">
+    <div class="qty-slider-head"><span class="qty-slider-label">&#128167; كمية المصلب</span><span class="qty-slider-value"><input type="number" id="mixHardNum" lang="en" dir="ltr" min="0" max="1000" step="0.1" value="10" oninput="onHardNumInput()"><span class="qty-slider-unit">جرام</span></span></div>
+    <input type="range" class="qty-range hardener" id="mixHardRange" min="0" max="1000" step="0.1" value="10" oninput="onHardRangeInput()">
+  </div>
+  <div class="qty-total-box"><span class="qty-total-label">إجمالي الخلطة</span><span class="qty-total-value" id="mixTotalVal">110.0 جرام</span></div>`;
+  document.getElementById('quantitiesCalcContent').innerHTML = h;
+  syncMixUI(100, m.ratio);
+}
+function activeMixRatio(){ const m=data.mixMaterials.find(x=>x.id===activeMixId); return m?m.ratio:10; }
+function paintRange(el,min,max,val,color){
+  if(!el) return;
+  if(max<=min){ el.style.background='#1e293b'; return; }
+  const pct = Math.max(0,Math.min(100,((val-min)/(max-min))*100));
+  el.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #1e293b ${pct}%, #1e293b 100%)`;
+}
+function syncMixUI(base, ratio){
+  base = Math.min(1000, Math.max(1, base||1));
+  const hard = Math.round(base*ratio/100*10)/10;
+  const baseRange=document.getElementById('mixBaseRange'), baseNum=document.getElementById('mixBaseNum'), hardRange=document.getElementById('mixHardRange'), hardNum=document.getElementById('mixHardNum');
+  if(!baseRange) return;
+  baseRange.value = base; baseNum.value = base;
+  hardRange.value = hard; hardNum.value = hard;
+  document.getElementById('mixTotalVal').textContent = (base+hard).toFixed(1)+' جرام';
+  paintRange(baseRange, 1, 1000, base, '#38bdf8');
+  paintRange(hardRange, 0, parseFloat(hardRange.max)||1, hard, '#f59e0b');
+}
+function onBaseRangeInput(){ syncMixUI(parseFloat(document.getElementById('mixBaseRange').value), activeMixRatio()); }
+function onBaseNumInput(){ syncMixUI(parseFloat(document.getElementById('mixBaseNum').value), activeMixRatio()); }
+function onHardRangeInput(){
+  const ratio=activeMixRatio(), hard=parseFloat(document.getElementById('mixHardRange').value)||0;
+  syncMixUI(ratio>0 ? hard/(ratio/100) : 1, ratio);
+}
+function onHardNumInput(){
+  const ratio=activeMixRatio(), hard=parseFloat(document.getElementById('mixHardNum').value)||0;
+  syncMixUI(ratio>0 ? hard/(ratio/100) : 1, ratio);
+}
+
 // ── Material Modals ──
 function populateSectionSelect(id){const s=document.getElementById(id);s.innerHTML='<option value="">-- اختر --</option>';data.sections.forEach(x=>s.innerHTML+=`<option value="${x}">${x}</option>`);}
 function resizeImage(file,cb){const r=new FileReader();r.onload=function(ev){const img=new Image();img.onload=function(){const c=document.createElement('canvas'),mx=500;let w=img.width,h=img.height;if(w>h){if(w>mx){h=h*mx/w;w=mx;}}else{if(h>mx){w=w*mx/h;h=mx;}}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.75));};img.src=ev.target.result;};r.readAsDataURL(file);}
@@ -529,6 +683,7 @@ function confirmDelete(){
   const type=document.getElementById('deleteType').value,id=document.getElementById('deleteId').value;
   if(type==='material'){data.materials=data.materials.filter(m=>m.id!==parseInt(id));showToast('تم الحذف');}
   else if(type==='packaging'){data.packaging=data.packaging.filter(p=>p.id!==parseInt(id));showToast('تم الحذف');renderPkgMaterials();}
+  else if(type==='mix'){data.mixMaterials=data.mixMaterials.filter(m=>m.id!==parseInt(id));showToast('تم الحذف');renderMixButtons();if(activeMixId===parseInt(id))backToQuantities();}
   saveData();closeModal('deleteModal');
   if(activeMaterialId&&!data.materials.some(m=>m.id===activeMaterialId))backToMaterials();
 }
