@@ -75,7 +75,7 @@ h1 { text-align: center; font-size: 28px; font-weight: 800; padding: 24px 0; bac
 .back-btn { background: none; border: none; color: #38bdf8; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px 0 18px; display: flex; align-items: center; gap: 6px; }
 .back-btn:hover { text-decoration: underline; }
 .material-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.material-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 12px; border: none; border-radius: 14px; cursor: pointer; font-family: inherit; color: #fff; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.22); transition: transform 0.2s ease, box-shadow 0.2s ease; animation: popIn 0.3s ease backwards; }
+.material-btn { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; border: none; border-radius: 14px; overflow: hidden; cursor: pointer; font-family: inherit; color: #fff; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.22); transition: transform 0.2s ease, box-shadow 0.2s ease; animation: popIn 0.3s ease backwards; }
 .material-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.32); }
 .material-btn:active { transform: scale(0.96); }
 .material-grid .material-btn:nth-child(1) { animation-delay: 0.02s; }
@@ -84,10 +84,11 @@ h1 { text-align: center; font-size: 28px; font-weight: 800; padding: 24px 0; bac
 .material-grid .material-btn:nth-child(4) { animation-delay: 0.14s; }
 .material-grid .material-btn:nth-child(5) { animation-delay: 0.18s; }
 .material-grid .material-btn:nth-child(6) { animation-delay: 0.22s; }
+.material-btn-body { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 10px 16px; }
 .material-btn-name { font-size: 15px; font-weight: 700; }
 .material-btn-price { font-size: 12px; opacity: 0.85; }
-.material-btn-img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(255,255,255,0.4); }
-.material-btn-img-placeholder { width: 44px; height: 44px; border-radius: 10px; border: 2px dashed rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.material-btn-img { width: 100%; height: 130px; object-fit: cover; display: block; background: rgba(255,255,255,0.12); border-bottom: 1px solid rgba(255,255,255,0.15); }
+.material-btn-img-placeholder { width: 100%; height: 130px; display: flex; align-items: center; justify-content: center; font-size: 40px; background: rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.15); }
 .mcolor-0 { background: linear-gradient(135deg, #38bdf8, #0ea5e9); }
 .mcolor-1 { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .mcolor-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
@@ -595,7 +596,7 @@ function backToMaterialsHome(){
   document.getElementById('materialsSectionView').style.display = 'none';
   document.getElementById('manageView').style.display = 'block';
 }
-function renderMaterials(){const l=document.getElementById('materialsList');if(!activeManageSection)return;const ms=data.materials.filter(m=>m.section===activeManageSection);if(!ms.length){l.innerHTML='<div class="empty-state">لا توجد مواد بعد.</div>';return;}let h='<div class="material-grid">';ms.forEach((m,i)=>{const cf=m.price>0&&m.qty>0,im=m.image?`<img class="material-btn-img" src="${m.image}">`:'<div class="material-btn-img-placeholder">&#128247;</div>';h+=`<button class="material-btn mcolor-${i%6}" onclick="withTransition(()=>showMaterialView(${m.id}))">${im}<span class="material-btn-name">${m.name}</span><span class="material-btn-price">${cf?m.price+' د.ك':'بدون سعر'}</span></button>`;});h+='</div>';l.innerHTML=h;}
+function renderMaterials(){const l=document.getElementById('materialsList');if(!activeManageSection)return;const ms=data.materials.filter(m=>m.section===activeManageSection);if(!ms.length){l.innerHTML='<div class="empty-state">لا توجد مواد بعد.</div>';return;}let h='<div class="material-grid">';ms.forEach((m,i)=>{const cf=m.price>0&&m.qty>0,im=m.image?`<img class="material-btn-img" src="${m.image}">`:'<div class="material-btn-img-placeholder">&#128247;</div>';h+=`<button class="material-btn mcolor-${i%6}" onclick="withTransition(()=>showMaterialView(${m.id}))">${im}<span class="material-btn-body"><span class="material-btn-name">${m.name}</span><span class="material-btn-price">${cf?m.price+' د.ك':'بدون سعر'}</span></span></button>`;});h+='</div>';l.innerHTML=h;}
 
 function showMaterialView(id){const m=data.materials.find(x=>x.id===id);if(!m)return;activeMaterialId=id;document.getElementById('materialsSectionView').style.display='none';document.getElementById('materialView').style.display='block';renderMaterialViewContent(m);}
 function backToMaterials(){activeMaterialId=null;document.getElementById('materialView').style.display='none';document.getElementById('materialsSectionView').style.display='block';renderMaterials();}
