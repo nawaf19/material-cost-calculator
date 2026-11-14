@@ -311,8 +311,8 @@ body.wax-screen{background:#0f172a;min-height:0}
 #waxDyeDialog select,#waxDyeDialog input{min-width:0;width:100%;font:inherit;font-size:16px;background:#0e1a29;color:#f1f5f9;border:1px solid #596b80;border-radius:7px;padding:7px}
 #waxDyeDialog p{font-size:14px;color:#d0ddeb}#waxDyeDialog a{color:#7dd3fc}
 .dye-dialog-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
-#waxDyeDialog #waxDyeAmount{display:block;min-height:44px;padding:0;accent-color:#66cbb7;cursor:pointer}
-.dye-range-ends{display:flex;justify-content:space-between;color:#b4c3d5;font-size:.8rem}
+#waxDyeDialog #waxDyePercent{display:block;min-height:44px;padding:0;accent-color:#66cbb7;cursor:pointer}
+#waxDyeDialog [hidden]{display:none!important}
 #waxDyeReading{color:#ffdfa3}
 </style>
 </head>
@@ -475,10 +475,18 @@ body.wax-screen{background:#0f172a;min-height:0}
           <h3 id="waxDyeHeading">لون الشمعة</h3>
           <label>لون الحرفي<select id="waxDyeSelect"></select></label>
           <p id="waxDyeDetails"></p>
-          <label for="waxDyeAmount">النسبة المستخدمة من عبوة اللون</label>
-          <strong id="waxDyeReading"></strong>
-          <input type="range" id="waxDyeAmount" min="0" max="100" step="0.1" value="0" dir="ltr">
-          <div class="dye-range-ends" dir="ltr"><span>٠٪</span><span>١٠٠٪</span></div>
+          <p id="waxDyeRateNote"></p>
+          <div id="waxDyeRange" hidden>
+            <label for="waxDyePercent">نسبة اللون من وزن الشمع المصبوب</label>
+            <input type="range" id="waxDyePercent" dir="ltr" disabled>
+            <output id="waxDyeReading" for="waxDyePercent"></output>
+          </div>
+          <label id="waxDyeAmountLabel" for="waxDyeAmount"></label>
+          <input id="waxDyeAmount" type="text" inputmode="decimal" autocomplete="off">
+          <div id="waxDyePackFields" hidden>
+            <label for="waxDyePackWeight">وزن عبوتك بالغرام لحساب التكلفة</label>
+            <input id="waxDyePackWeight" type="text" inputmode="decimal" autocomplete="off">
+          </div>
           <p id="waxDyeEstimate"></p>
           <a id="waxDyeLink" target="_blank" rel="noopener">صفحة اللون في الحرفي</a>
           <div class="dye-dialog-actions">
@@ -968,7 +976,7 @@ function setupWaxPour(){
   const stream = document.getElementById('waxStream');
 
   // Alherafy retail packages checked 2026-11-14. Size 0 means the seller
-  // gives no weight; cost these by the user's percentage of one package.
+  // gives no weight; use the measured package weight for costing.
   const dyeCatalog = [
     {"name":"ملوّن 10 مل - أزرق سماوي","unit":"مل","size":10,"price":0.3,"color":"#68b9e2","slug":"ملوّن-10-مل-أزرق-سماوي-1"},
     {"name":"ملوّن بنفسجي 10 مل","unit":"مل","size":10,"price":0.3,"color":"#895ac5","slug":"ملوّن-بنفسجي-10-مل-1"},
@@ -1033,11 +1041,25 @@ function setupWaxPour(){
     mixCost.textContent = costFormat.format(waxCost + usedDyeCost);
   }
   const packText = p => (p.size ? p.size + ' ' + p.unit + ' · ' : '') + costFormat.format(p.price) + ' د.ك';
-  const portionCost = (p,amount) => amount * p.price / (p.size || 100);
+  const percentInput = byId('waxDyePercent');
+  const packWeight = byId('waxDyePackWeight');
+  let selectedPackSize = chosenDye.size;
+  let selectedPercent = null;
+  const portionCost = (p,amount,size) => amount / size * p.price;
+  // Set waxMassPercent {min,max,step} only after verifying the supplier's
+  // mass-based instructions for this SKU. Liquid conversion also needs g/ml.
+  const verifiedRange = p => p.waxMassPercent && (p.unit === 'غ' || p.gramsPerMl > 0) ? p.waxMassPercent : null;
+  function measuredValue(field){
+    const raw = field.value.trim().replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632)
+      .replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/[٫،,]/g,'.');
+    return /^(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw) ? Number(raw) : NaN;
+  }
   const amountFormat = new Intl.NumberFormat('ar-KW-u-nu-arab',{maximumFractionDigits:3});
   function amountValue(){
     const p = dyeCatalog[Number(dyeSelect.value)];
-    return (p.size || 100) * dyeAmount.valueAsNumber / 100;
+    if(!verifiedRange(p)) return measuredValue(dyeAmount);
+    const waxGrams = waxCost / waxKwdPerGram;
+    return waxGrams * percentInput.valueAsNumber / 100 / (p.unit === 'غ' ? 1 : p.gramsPerMl);
   }
   function stopDye(){
     if(dyeFrame !== null) cancelAnimationFrame(dyeFrame);
@@ -1065,40 +1087,65 @@ function setupWaxPour(){
   function showEstimate(){
     const p = dyeCatalog[Number(dyeSelect.value)];
     const amount = amountValue();
-    const percent = amountFormat.format(dyeAmount.valueAsNumber)+'٪';
-    const reading = percent+' من العبوة'+(p.size ? ' · '+amountFormat.format(amount)+' '+p.unit : '');
-    byId('waxDyeReading').textContent = reading;
-    dyeAmount.setAttribute('aria-valuetext',reading);
-    byId('waxDyeEstimate').textContent = 'تكلفة الكمية '+costFormat.format(portionCost(p,amount))+' د.ك';
-    return amount > 0;
+    const size = p.size || measuredValue(packWeight);
+    const valid = Number.isFinite(amount) && amount > 0 && Number.isFinite(size) && size > 0;
+    if(verifiedRange(p)){
+      byId('waxDyeReading').textContent = amountFormat.format(percentInput.valueAsNumber)+'٪ · '+amountFormat.format(amount)+' '+p.unit;
+    }
+    byId('waxDyeEstimate').textContent = valid ? 'تكلفة الكمية '+costFormat.format(portionCost(p,amount,size))+' د.ك' : '';
+    return valid;
   }
   function showDraft(){
     const p = dyeCatalog[Number(dyeSelect.value)];
     byId('waxDyeDetails').textContent = 'سعر العبوة '+packText(p);
     byId('waxDyeLink').href = 'https://alherafy.com/ar/products/'+encodeURIComponent(p.slug);
+    const range = verifiedRange(p);
+    byId('waxDyeRange').hidden = !range;
+    percentInput.disabled = !range;
+    dyeAmount.hidden = !!range;
+    dyeAmount.disabled = !!range;
+    byId('waxDyeAmountLabel').hidden = !!range;
+    byId('waxDyeAmountLabel').textContent = 'الكمية المقاسة فعليًا ('+p.unit+')';
+    byId('waxDyePackFields').hidden = !!p.size;
+    byId('waxDyeRateNote').textContent = range ? 'نطاق الاستخدام المنشور من الحرفي' : 'لا تتوفر نسبة خلط موثّقة من الحرفي لهذا اللون.';
+    if(range){
+      percentInput.min = range.min;
+      percentInput.max = range.max;
+      percentInput.step = range.step || 'any';
+      percentInput.value = p === chosenDye && selectedPercent !== null ? selectedPercent : range.min;
+    }
+    dyeAmount.value = p === chosenDye && dose ? dose : '';
+    packWeight.value = p === chosenDye && selectedPackSize ? selectedPackSize : '';
     dyeAmount.setCustomValidity('');
+    packWeight.setCustomValidity('');
     showEstimate();
   }
   function openDyePicker(){
     stopDye();
     dyeSelect.value = String(dyeCatalog.indexOf(chosenDye));
-    dyeAmount.value = String(100 * dose / (chosenDye.size || 100));
     showDraft();
     dyeDialog.showModal();
   }
   diagram.querySelectorAll('[data-dye-picker]').forEach(el=>el.addEventListener('click',openDyePicker));
-  dyeSelect.addEventListener('change',()=>{dyeAmount.value='0';showDraft();});
+  dyeSelect.addEventListener('change',showDraft);
+  percentInput.addEventListener('input',showEstimate);
+  packWeight.addEventListener('input',()=>{packWeight.setCustomValidity('');showEstimate();});
   dyeAmount.addEventListener('input',()=>{dyeAmount.setCustomValidity('');showEstimate();});
   dyeDialog.querySelector('form').addEventListener('submit',event=>{
     event.preventDefault();
     if(!showEstimate()){
-      dyeAmount.setCustomValidity('حرّك المؤشر لاختيار كمية أكبر من صفر.');
-      dyeAmount.reportValidity();
+      const p = dyeCatalog[Number(dyeSelect.value)];
+      const field = !p.size && !(measuredValue(packWeight)>0) ? packWeight : dyeAmount;
+      if(verifiedRange(p) && field === dyeAmount){byId('waxDyeEstimate').textContent='أضف الشمع إلى الكلاس أولًا.';return;}
+      field.setCustomValidity('أدخل كمية موجبة بالوحدة الموضّحة.');
+      field.reportValidity();
       return;
     }
     const selected = dyeCatalog[Number(dyeSelect.value)];
     const nextDose = amountValue();
     if(selected !== chosenDye || nextDose !== dose) dispensed = 0;
+    selectedPackSize = selected.size || measuredValue(packWeight);
+    selectedPercent = verifiedRange(selected) ? percentInput.valueAsNumber : null;
     chosenDye = selected;
     dose = nextDose;
     showChoice();
@@ -1126,7 +1173,7 @@ function setupWaxPour(){
     dyeTap.setAttribute('aria-pressed','true');
     function drip(now){
       dispensed = Math.min(dose,prior + dose*Math.max(0,now-started)/1500);
-      usedDyeCost = priorCost + portionCost(chosenDye,dispensed-prior);
+      usedDyeCost = priorCost + portionCost(chosenDye,dispensed-prior,selectedPackSize);
       if(dispensed>prior){
         lastTint = chosenDye.color;
         dyeSurface.style.fill = lastTint;
