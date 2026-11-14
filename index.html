@@ -312,6 +312,9 @@ body.wax-screen{background:#0f172a;min-height:0}
 .wax-diagram{--molten-wax:#f1e6be}
 .dye-preview{display:flex;align-items:center;gap:8px;margin:10px 0}
 #waxDyeSwatch{width:28px;height:28px;border-radius:50%;border:1px solid #93a3b5}
+.wax-mix-cost{position:absolute;inset-inline:0;bottom:0;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;column-gap:1.4em;font-size:clamp(11px,2.65vw,16px);line-height:1.4;color:#d2deeb}
+.wax-mix-cost strong{color:#ffe2a3}
+.wax-mix-cost output{white-space:nowrap;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -462,6 +465,7 @@ body.wax-screen{background:#0f172a;min-height:0}
           <span>د.ك</span>
         </div>
         <output class="wax-status" id="waxPourStatus" aria-live="off"></output>
+        <div class="wax-mix-cost"><span>تكلفة اللون <output id="waxColorCost" aria-live="off">٠٫٠٠٠ د.ك</output></span><strong>الشمع واللون <output id="waxCombinedCost" aria-live="off">٠٫٠٠٠ د.ك</output></strong></div>
         <label class="wax-reading wax-price wax-cup-reading">السعر<input aria-label="السعر — الكوب" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input id="waxCupWeight" aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
       </div>
@@ -1010,7 +1014,23 @@ function setupWaxPour(){
   const dyePool = byId('waxDyePool');
   let chosenDye = dyeCatalog[0];
   let cupTint = '';
-  let hasWax = false;
+  let pouredGrams = 0;
+  const dyeMlPerKg = 10;
+  const dyeCostOutput = byId('waxColorCost');
+  const totalOutput = byId('waxCombinedCost');
+  function updateCosts(){
+    const waxCost = pouredGrams * waxKwdPerGram;
+    cost.textContent = costFormat.format(waxCost);
+    if(cupTint && pouredGrams > 0 && chosenDye.unit !== 'مل'){
+      dyeCostOutput.textContent = 'لم تُحدّد تغطية العبوة';
+      totalOutput.textContent = '—';
+      return;
+    }
+    const dyeCost = cupTint && chosenDye.unit === 'مل'
+      ? pouredGrams / 1000 * dyeMlPerKg * chosenDye.price / chosenDye.size : 0;
+    dyeCostOutput.textContent = costFormat.format(dyeCost)+' د.ك';
+    totalOutput.textContent = costFormat.format(waxCost + dyeCost)+' د.ك';
+  }
   let dripTimer;
   function stopDye(){
     clearTimeout(dripTimer);
@@ -1021,7 +1041,8 @@ function setupWaxPour(){
     cupTint = color;
     dyeSurface.style.fill = color;
     dyeSurface.style.stroke = color;
-    dyePool.style.fill = hasWax ? 'none' : (color || 'none');
+    dyePool.style.fill = pouredGrams > 0 ? 'none' : (color || 'none');
+    updateCosts();
   }
   function addColor(){
     stopDye();
@@ -1119,11 +1140,10 @@ function setupWaxPour(){
       tank.setAttribute('transform','translate(0 '+(82+20*progress)+')');
       cup.setAttribute('transform','translate(0 '+surface+')');
       stream.setAttribute('d','M199 149V'+Math.min(229,surface));
-      const pouredGrams = progress === 1 ? grams : Math.floor(grams*progress*10)/10;
+      pouredGrams = progress === 1 ? grams : Math.floor(grams*progress*10)/10;
       status.textContent = (progress === 1 ? raw : pouredGrams.toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
-      hasWax = pouredGrams > 0;
-      dyePool.style.fill = hasWax ? 'none' : (cupTint || 'none');
-      cost.textContent = costFormat.format(pouredGrams * waxKwdPerGram);
+      dyePool.style.fill = pouredGrams > 0 ? 'none' : (cupTint || 'none');
+      updateCosts();
       if(progress < 1) frame = requestAnimationFrame(draw);
       else setOpen(false);
     }
