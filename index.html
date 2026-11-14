@@ -243,6 +243,14 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
 @media (max-width: 700px) {
   .form-row { grid-template-columns: 1fr; }
 }
+
+.wax-diagram{position:relative;width:min(100%,540px);margin:0 auto 12px;aspect-ratio:400/424;isolation:isolate;background:radial-gradient(ellipse at 57% 38%,#26374988,transparent 70%);color:#e2e8f0}
+.wax-diagram svg{display:block;width:100%;height:100%}
+.wax-reading{position:absolute;width:22%;display:grid;gap:2px;text-align:center;font-size:clamp(11px,2.8vw,14px);color:#cbd5e1;font-weight:600;transform:translateY(-50%)}
+.wax-reading input{display:block;width:100%;min-width:0;height:clamp(26px,6vw,36px);border:1px solid #536579;border-radius:7px;background:#111c2d;color:#f8fafc;text-align:center;font:inherit}
+.wax-reading input:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+.wax-price{left:1%}.wax-weight{right:1%}
+.wax-cup-reading{top:49%}.wax-tool-reading{top:68%}.wax-bowl-reading{top:89%}
 </style>
 </head>
 <body>
@@ -325,6 +333,46 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
     <div class="card">
       <h2 id="materialsSectionTitle"></h2>
       <div class="btn-row" id="materialsSectionToolbar" style="margin-bottom:20px;"></div>
+      <div id="waxDiagram" class="wax-diagram" hidden>
+        <svg viewBox="0 0 400 424" role="img" aria-labelledby="waxDiagramTitle" fill="none" stroke-linejoin="round" stroke-linecap="round">
+          <title id="waxDiagramTitle">خزان الشمع وحنفيته فوق كوب الاستقبال، ثم أداة مائلة ووعاء دائري</title>
+          <defs>
+            <linearGradient id="waxMetal"><stop stop-color="#425369"/><stop offset=".32" stop-color="#a7b7c9"/><stop offset=".55" stop-color="#63768a"/><stop offset="1" stop-color="#354457"/></linearGradient>
+            <linearGradient id="waxAmber" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#ffe2a3"/><stop offset="1" stop-color="#c78a43"/></linearGradient>
+          </defs>
+          <rect id="waxBlankBox" x="328" y="13" width="49" height="49" rx="5" stroke="#718499" fill="#162234"/>
+          <g id="waxTank" stroke="#b9c9d7" stroke-width="2">
+            <path d="M222 37Q257 26 294 37V123Q257 134 222 123Z" fill="#23384b"/>
+            <path d="M224 82Q233 76 244 82T267 82T292 81V121Q257 131 224 121Z" fill="url(#waxAmber)" stroke="#f9d69b"/>
+            <ellipse cx="258" cy="37" rx="36" ry="7" fill="url(#waxMetal)"/>
+          </g>
+          <g id="waxTap" stroke="#cad6df" stroke-width="2">
+            <path d="M222 105H205Q195 105 195 116V124H203V117Q203 113 208 113H222Z" fill="url(#waxMetal)"/>
+            <path d="M208 105V98M201 97H215" stroke-width="4"/>
+          </g>
+          <path id="waxFlowPath" d="M199 132V177" stroke="#e5b66f" stroke-width="2" stroke-dasharray="3 7"/>
+          <g id="waxCup" stroke="#adbdcc" stroke-width="2">
+            <path d="M174 187L178 228Q199 235 220 228L224 187" fill="url(#waxMetal)"/>
+            <ellipse cx="199" cy="187" rx="25" ry="6" fill="#293b4c"/>
+          </g>
+          <g id="waxTool" transform="rotate(26 144 278)" stroke="#e2c299" stroke-width="2">
+            <path d="M105 265Q118 259 132 264L147 271H164V285H146L129 291Q114 294 105 285Q98 277 105 265Z" fill="#866644"/>
+            <path d="M164 273H177V283H164Z" fill="#c4ab89"/>
+          </g>
+          <g id="waxBowl" stroke="#bed0dd" stroke-width="2">
+            <path d="M193 244H204L208 327H198Z" fill="url(#waxMetal)"/>
+            <path d="M155 342Q158 378 176 390Q198 400 222 391Q240 378 245 342Z" fill="url(#waxMetal)"/>
+            <ellipse cx="200" cy="342" rx="45" ry="15" fill="#435465"/>
+            <ellipse cx="200" cy="342" rx="37" ry="10" fill="#243445" stroke="#889cac"/>
+          </g>
+        </svg>
+        <label class="wax-reading wax-price wax-cup-reading">السعر<input aria-label="السعر — الكوب" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-price wax-tool-reading">السعر<input aria-label="السعر — الأداة المائلة" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-weight wax-tool-reading">الوزن (غرام)<input aria-label="الوزن (غرام) — الأداة المائلة" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-price wax-bowl-reading">السعر<input aria-label="السعر — الوعاء" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-weight wax-bowl-reading">الوزن (غرام)<input aria-label="الوزن (غرام) — الوعاء" inputmode="decimal" autocomplete="off"></label>
+      </div>
       <div id="materialsList"></div>
     </div>
   </div>
@@ -587,16 +635,20 @@ function openMaterialsSection(section){
   document.getElementById('manageView').style.display = 'none';
   document.getElementById('materialsSectionView').style.display = 'block';
   document.getElementById('materialsSectionTitle').textContent = section;
-  let tb = `<button class="btn btn-success" onclick="showAddMaterialModal()">+ إضافة مادة</button>`;
-  if (section === 'الشموع') tb += `<button class="btn btn-warning" onclick="importAlherafyWax()">استيراد شمع Alherafy</button><button class="btn btn-warning" onclick="importAtiabWax()">استيراد شمع Atiab</button>`;
-  document.getElementById('materialsSectionToolbar').innerHTML = tb;
+  const toolbar = document.getElementById('materialsSectionToolbar');
+  toolbar.style.display = section === 'الشموع' ? 'none' : '';
+  toolbar.innerHTML = section === 'الشموع' ? '' : '<button class="btn btn-success" onclick="showAddMaterialModal()">+ إضافة مادة</button>';
   renderMaterials();
 }
 function backToMaterialsHome(){
   document.getElementById('materialsSectionView').style.display = 'none';
   document.getElementById('manageView').style.display = 'block';
 }
-function renderMaterials(){const l=document.getElementById('materialsList');if(!activeManageSection)return;const ms=data.materials.filter(m=>m.section===activeManageSection);if(!ms.length){l.innerHTML='<div class="empty-state">لا توجد مواد بعد.</div>';return;}let h='<div class="material-grid">';ms.forEach((m,i)=>{const cf=m.price>0&&m.qty>0,im=m.image?`<img class="material-btn-img" src="${m.image}">`:'<div class="material-btn-img-placeholder">&#128247;</div>';h+=`<button class="material-btn mcolor-${i%6}" onclick="withTransition(()=>showMaterialView(${m.id}))">${im}<span class="material-btn-body"><span class="material-btn-name">${m.name}</span><span class="material-btn-price">${cf?m.price+' د.ك':'بدون سعر'}</span></span></button>`;});h+='</div>';l.innerHTML=h;}
+function renderMaterials(){const l=document.getElementById('materialsList');const wax = activeManageSection === 'الشموع';
+  document.getElementById('waxDiagram').hidden = !wax;
+  l.hidden = wax;
+  if(wax){l.replaceChildren();return;}
+  if(!activeManageSection)return;const ms=data.materials.filter(m=>m.section===activeManageSection);if(!ms.length){l.innerHTML='<div class="empty-state">لا توجد مواد بعد.</div>';return;}let h='<div class="material-grid">';ms.forEach((m,i)=>{const cf=m.price>0&&m.qty>0,im=m.image?`<img class="material-btn-img" src="${m.image}">`:'<div class="material-btn-img-placeholder">&#128247;</div>';h+=`<button class="material-btn mcolor-${i%6}" onclick="withTransition(()=>showMaterialView(${m.id}))">${im}<span class="material-btn-body"><span class="material-btn-name">${m.name}</span><span class="material-btn-price">${cf?m.price+' د.ك':'بدون سعر'}</span></span></button>`;});h+='</div>';l.innerHTML=h;}
 
 function showMaterialView(id){const m=data.materials.find(x=>x.id===id);if(!m)return;activeMaterialId=id;document.getElementById('materialsSectionView').style.display='none';document.getElementById('materialView').style.display='block';renderMaterialViewContent(m);}
 function backToMaterials(){activeMaterialId=null;document.getElementById('materialView').style.display='none';document.getElementById('materialsSectionView').style.display='block';renderMaterials();}
