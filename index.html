@@ -252,12 +252,12 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
 .wax-price{left:1%}.wax-weight{right:1%}
 .wax-cup-reading{top:81%}
 
-.wax-tap-control{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:13%;height:21%;min-width:44px;min-height:44px;background:transparent;border:0;cursor:pointer;touch-action:manipulation}
+.wax-tap-control{position:absolute;left:54.5%;top:40%;transform:translate(-50%,-50%);width:21%;height:40%;min-width:44px;min-height:44px;background:transparent;border:0;cursor:pointer;touch-action:manipulation}
 .wax-tap-control:focus-visible{outline:2px solid #ffd89d;border-radius:8px}
 .wax-status{position:absolute;left:27%;top:61%;font-size:clamp(10px,2.6vw,14px);color:#ffe2a3;direction:rtl}
 .wax-wave{animation:waxRipple 2.8s linear infinite}
-#waxValve{transform-origin:199px 107px;transition:transform .28s ease-in-out}
-.wax-tap-open #waxValve{transform:rotate(-66deg)}
+#waxValve{transform-box:view-box;transform-origin:224px 94px;transition:transform .32s ease-in-out}
+.wax-tap-open #waxValve{transform:rotate(80deg)}
 #waxStream{opacity:0}
 .wax-pouring #waxStream{opacity:1}
 .wax-pouring #waxFlowPath{opacity:0}
@@ -382,28 +382,38 @@ body.wax-screen{background:#0f172a;min-height:0}
             <linearGradient id="waxMetal"><stop stop-color="#425369"/><stop offset=".32" stop-color="#a7b7c9"/><stop offset=".55" stop-color="#63768a"/><stop offset="1" stop-color="#354457"/></linearGradient>
             <linearGradient id="waxAmber" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#ffe2a3"/><stop offset="1" stop-color="#c78a43"/></linearGradient>
           </defs>
-          <rect id="waxBlankBox" x="328" y="13" width="49" height="49" rx="5" stroke="#718499" fill="#162234"/>
-          <g id="waxTank" stroke="#b9c9d7" stroke-width="2">
+          <rect id="waxBlankBox" x="342" y="13" width="49" height="49" rx="5" stroke="#718499" fill="#162234"/>
+          <g id="waxTank" transform="translate(36 0)" stroke="#b9c9d7" stroke-width="2">
             <path d="M222 37Q257 26 294 37V123Q257 134 222 123Z" fill="#23384b"/>
             <g clip-path="url(#waxTankGlass)"><g id="waxTankLevel" transform="translate(0 82)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffdf9a"/></g></g>
             <ellipse cx="258" cy="37" rx="36" ry="7" fill="url(#waxMetal)"/>
           </g>
-          <path id="waxFlowPath" d="M199 138V177" stroke="#e5b66f" stroke-width="2" stroke-dasharray="3 7"/>
+          <path id="waxFlowPath" d="M199 155V177" stroke="#e5b66f" stroke-width="2" stroke-dasharray="3 7"/>
           <g id="waxCup" stroke="#adbdcc" stroke-width="2">
             <path d="M174 187L178 228Q199 235 220 228L224 187" fill="#223547"/>
             <ellipse cx="199" cy="187" rx="25" ry="6" fill="#293b4c"/>
           </g>
           <g clip-path="url(#waxCupGlass)"><g id="waxCupLevel" transform="translate(0 237)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffe3a7"/></g></g>
-          <path id="waxStream" d="M199 112V231" stroke="#ffd898" stroke-width="3"/>
-          <g id="waxTap" stroke="#efead5" stroke-width="1.15">
-            <path d="M213 102H223V105H213Z" fill="url(#waxMetal)"/>
-            <path d="M189 99L192 96H201L204 98H208V96H212V99H216V106H212V109H208V106H202L201 113H196L194 107H189Z" fill="url(#tapBrass)"/>
-            <path d="M191 100H201M209 99V105" stroke="#fff2c4" stroke-width=".8"/>
+          <path id="waxStream" d="M199 149V231" stroke="#ffd898" stroke-width="3"/>
+          <g id="waxTap" stroke-linejoin="round">
+            <!-- The flange fastens the horizontal pipe to the tank wall. -->
+            <ellipse cx="258" cy="117" rx="5" ry="14" fill="url(#tapBrass)" stroke="#f4dfaf" stroke-width="1.4"/>
+            <path d="M257 110H212C199 110 193 118 193 131V145H205V132Q205 124 213 124H257Z" fill="url(#tapBrass)" stroke="#ebd19b" stroke-width="1.6"/>
+            <path d="M252 113H213Q197 113 197 131V140" stroke="#fff1be" stroke-width="1.5"/>
+            <rect x="246" y="108" width="6" height="18" rx="1.5" fill="url(#tapBrass)" stroke="#c9aa69"/>
+            <!-- The lip and dark opening face the centre of the glass. -->
+            <rect x="191.5" y="140" width="15" height="8" rx="2" fill="url(#tapBrass)" stroke="#f8e2ae"/>
+            <ellipse cx="199" cy="148" rx="6.5" ry="2" fill="#302a20" stroke="#d4b775"/>
+            <!-- Only the lever moves. Its hinge and pipe stay fixed. -->
+            <path d="M217 111V102L221 100V94H227V100L231 102V111Z" fill="url(#tapBrass)" stroke="#eed6a2" stroke-width="1.2"/>
+            <rect x="216" y="106" width="16" height="5" rx="1.4" fill="url(#tapBrass)" stroke="#cbaa67"/>
             <g id="waxValve">
-              <path d="M195.4 108Q194.2 104.5 198.7 104Q203 103.8 203.1 107.5L201.7 114L203.5 127Q204.2 133 199.8 134Q194 134.5 194.8 127.2L196.4 115Z" fill="url(#tapEnamel)"/>
-              <path d="M197.2 129Q196.7 126 197.7 120" stroke="#94babb" stroke-width=".8"/>
-              <circle cx="199" cy="107" r="2.1" fill="#d8bd7d" stroke="#2c3936"/><circle cx="199" cy="107" r=".8" fill="#3e4841" stroke="none"/>
+              <path d="M224 94L206 98" stroke="#ead9ac" stroke-width="5"/>
+              <path d="M209 93.7Q212 94 212 97.5Q212 100 209 101L187 106Q182 107 181 102Q180 98 185 97Z" fill="url(#tapEnamel)" stroke="#aed3d0" stroke-width="1.5"/>
+              <path d="M185 99.5L207 95.7" stroke="#a0c5bf" stroke-width="1.2"/>
             </g>
+            <circle cx="224" cy="94" r="5" fill="url(#tapBrass)" stroke="#f8e6ba"/>
+            <circle cx="224" cy="94" r="1.8" fill="#455051"/>
           </g>
         </svg>
         <button type="button" class="wax-tap-control" id="waxPourButton" aria-label="حنفية الشمع" aria-pressed="false"></button>
@@ -926,7 +936,7 @@ function setupWaxPour(){
       const surface = 237 - 42 * progress;
       tank.setAttribute('transform','translate(0 '+(82+20*progress)+')');
       cup.setAttribute('transform','translate(0 '+surface+')');
-      stream.setAttribute('d','M199 112V'+Math.min(229,surface));
+      stream.setAttribute('d','M199 149V'+Math.min(229,surface));
       status.textContent = (progress === 1 ? raw : (Math.floor(grams*progress*10)/10).toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
       if(progress < 1) frame = requestAnimationFrame(draw);
       else setOpen(false);
