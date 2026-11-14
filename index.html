@@ -254,6 +254,8 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
 
 .wax-tap-control{position:absolute;left:54.5%;top:40%;transform:translate(-50%,-50%);width:21%;height:40%;min-width:44px;min-height:44px;background:transparent;border:0;cursor:pointer;touch-action:manipulation}
 .wax-tap-control:focus-visible{outline:2px solid #ffd89d;border-radius:8px}
+.wax-cost{position:absolute;top:2%;right:0;width:17%;padding:3px 1px;display:grid;justify-items:center;align-content:center;background:#162234;border:1px solid #718499;border-radius:6px;color:#cbd5e1;font-size:clamp(9px,2.5vw,13px);line-height:1.45}
+.wax-cost output{color:#ffe2a3;font-size:clamp(13px,3.6vw,22px);line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums}
 .wax-status{position:absolute;left:27%;top:61%;font-size:clamp(10px,2.6vw,14px);color:#ffe2a3;direction:rtl}
 .wax-wave{animation:waxRipple 2.8s linear infinite}
 #waxValve{transform-box:view-box;transform-origin:224px 94px;transition:transform .32s ease-in-out}
@@ -382,7 +384,6 @@ body.wax-screen{background:#0f172a;min-height:0}
             <linearGradient id="waxMetal"><stop stop-color="#425369"/><stop offset=".32" stop-color="#a7b7c9"/><stop offset=".55" stop-color="#63768a"/><stop offset="1" stop-color="#354457"/></linearGradient>
             <linearGradient id="waxAmber" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#ffe2a3"/><stop offset="1" stop-color="#c78a43"/></linearGradient>
           </defs>
-          <rect id="waxBlankBox" x="342" y="13" width="49" height="49" rx="5" stroke="#718499" fill="#162234"/>
           <g id="waxTank" transform="translate(36 0)" stroke="#b9c9d7" stroke-width="2">
             <path d="M222 37Q257 26 294 37V123Q257 134 222 123Z" fill="#23384b"/>
             <g clip-path="url(#waxTankGlass)"><g id="waxTankLevel" transform="translate(0 82)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffdf9a"/></g></g>
@@ -417,6 +418,11 @@ body.wax-screen{background:#0f172a;min-height:0}
           </g>
         </svg>
         <button type="button" class="wax-tap-control" id="waxPourButton" aria-label="حنفية الشمع" aria-pressed="false"></button>
+        <div class="wax-cost" dir="rtl">
+          <span>تكلفة الشمع</span>
+          <output id="waxPouredCost" aria-label="تكلفة الشمع المصبوب بالدينار الكويتي" aria-live="off">٠٫٠٠٠</output>
+          <span>د.ك</span>
+        </div>
         <output class="wax-status" id="waxPourStatus" aria-live="off"></output>
         <label class="wax-reading wax-price wax-cup-reading">السعر<input aria-label="السعر — الكوب" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input id="waxCupWeight" aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
@@ -892,6 +898,11 @@ function setupWaxPour(){
   const button = document.getElementById('waxPourButton');
   const input = document.getElementById('waxCupWeight');
   const status = document.getElementById('waxPourStatus');
+  const cost = document.getElementById('waxPouredCost');
+  const waxKwdPerGram = 4 / 1000;
+  const costFormat = new Intl.NumberFormat('ar-KW-u-nu-arab', {
+    minimumFractionDigits: 3, maximumFractionDigits: 3, useGrouping: false
+  });
   const tank = document.getElementById('waxTankLevel');
   const cup = document.getElementById('waxCupLevel');
   const stream = document.getElementById('waxStream');
@@ -937,7 +948,9 @@ function setupWaxPour(){
       tank.setAttribute('transform','translate(0 '+(82+20*progress)+')');
       cup.setAttribute('transform','translate(0 '+surface+')');
       stream.setAttribute('d','M199 149V'+Math.min(229,surface));
-      status.textContent = (progress === 1 ? raw : (Math.floor(grams*progress*10)/10).toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
+      const pouredGrams = progress === 1 ? grams : Math.floor(grams*progress*10)/10;
+      status.textContent = (progress === 1 ? raw : pouredGrams.toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
+      cost.textContent = costFormat.format(pouredGrams * waxKwdPerGram);
       if(progress < 1) frame = requestAnimationFrame(draw);
       else setOpen(false);
     }
