@@ -303,17 +303,15 @@ body.wax-screen{background:#0f172a;min-height:0}
 @media(prefers-reduced-motion:reduce){.dye-running .dye-drop{animation:none;opacity:1}#waxDyeLever{transition:none}}
 .dye-choice{position:absolute;left:1%;top:1%;width:34%;border:1px solid #50657b;border-radius:8px;background:#19283a;color:#edf4fa;cursor:pointer;font:inherit;font-size:clamp(11px,2.7vw,15px);padding:3px 5px;line-height:1.45}
 .dye-choice small{display:block;color:#b6cbdc}
-.wax-total{display:grid;position:absolute;bottom:0;left:20%;width:60%;text-align:center;color:#e3edfa;font-size:clamp(11px,2.8vw,16px);line-height:1.4}
-.wax-total small{font-size:.83em;color:#b4c3d5}
 #waxDyeDialog{margin:auto;width:min(92vw,420px);max-height:90vh;overflow:auto;padding:20px;border:1px solid #50657b;border-radius:14px;background:#172436;color:#eef4fb;font:inherit;direction:rtl}
 #waxDyeDialog::backdrop{background:#050a13b8}
 #waxDyeDialog label{display:grid;gap:5px;margin:12px 0}
-#waxDyeDialog select,#waxDyeDialog input{min-width:0;width:100%;font:inherit;font-size:16px;background:#0e1a29;color:#f1f5f9;border:1px solid #596b80;border-radius:7px;padding:7px}
+#waxDyeDialog select{min-width:0;width:100%;font:inherit;font-size:16px;background:#0e1a29;color:#f1f5f9;border:1px solid #596b80;border-radius:7px;padding:7px}
 #waxDyeDialog p{font-size:14px;color:#d0ddeb}#waxDyeDialog a{color:#7dd3fc}
 .dye-dialog-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
-#waxDyeDialog #waxDyePercent{display:block;min-height:44px;padding:0;accent-color:#66cbb7;cursor:pointer}
-#waxDyeDialog [hidden]{display:none!important}
-#waxDyeReading{color:#ffdfa3}
+.wax-diagram{--molten-wax:#f1e6be}
+.dye-preview{display:flex;align-items:center;gap:8px;margin:10px 0}
+#waxDyeSwatch{width:28px;height:28px;border-radius:50%;border:1px solid #93a3b5}
 </style>
 </head>
 <body>
@@ -405,14 +403,13 @@ body.wax-screen{background:#0f172a;min-height:0}
             <linearGradient id="tapBrass" x2="0" y2="1"><stop stop-color="#fff1bc"/><stop offset=".27" stop-color="#d8b872"/><stop offset=".62" stop-color="#a58945"/><stop offset="1" stop-color="#65552d"/></linearGradient>
             <linearGradient id="tapEnamel"><stop stop-color="#173c40"/><stop offset=".30" stop-color="#386467"/><stop offset=".51" stop-color="#609094"/><stop offset=".78" stop-color="#365a5c"/><stop offset="1" stop-color="#192f31"/></linearGradient>
             <linearGradient id="waxMetal"><stop stop-color="#425369"/><stop offset=".32" stop-color="#a7b7c9"/><stop offset=".55" stop-color="#63768a"/><stop offset="1" stop-color="#354457"/></linearGradient>
-            <linearGradient id="waxAmber" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#ffe2a3"/><stop offset="1" stop-color="#c78a43"/></linearGradient>
           </defs>
           <g id="waxTank" transform="translate(36 0)" stroke="#b9c9d7" stroke-width="2">
             <path d="M222 37Q257 26 294 37V123Q257 134 222 123Z" fill="#23384b"/>
-            <g clip-path="url(#waxTankGlass)"><g id="waxTankLevel" transform="translate(0 82)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffdf9a"/></g></g>
+            <g clip-path="url(#waxTankGlass)"><g id="waxTankLevel" transform="translate(0 82)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="var(--molten-wax)" stroke="#fff5d7"/></g></g>
             <ellipse cx="258" cy="37" rx="36" ry="7" fill="url(#waxMetal)"/>
           </g>
-          <path id="waxFlowPath" d="M199 155V177" stroke="#e5b66f" stroke-width="2" stroke-dasharray="3 7"/>
+          <path id="waxFlowPath" d="M199 155V177" stroke="#c4bd9e" stroke-width="2" stroke-dasharray="3 7"/>
           <g id="waxDyeBottle" transform="translate(153 129) rotate(-37)" stroke-linejoin="round">
             <path d="M-18 -83Q-18 -89 -12 -89H12Q18 -89 18 -83V-46Q18 -40 9 -37V-32H-9V-37Q-18 -40 -18 -46Z" fill="#163d51" stroke="#9cb5be" stroke-width="1.3"/>
             <rect x="-16" y="-80" width="32" height="30" rx="3" fill="var(--wax-dye,#68b9e2)"/>
@@ -431,9 +428,9 @@ body.wax-screen{background:#0f172a;min-height:0}
             <path d="M174 187L178 228Q199 235 220 228L224 187" fill="#223547"/>
             <ellipse cx="199" cy="187" rx="25" ry="6" fill="#293b4c"/>
           </g>
-          <g clip-path="url(#waxCupGlass)"><g id="waxCupLevel" transform="translate(0 237)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffe3a7"/></g></g>
+          <g clip-path="url(#waxCupGlass)"><g id="waxCupLevel" transform="translate(0 237)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="var(--molten-wax)" stroke="#fff5d7"/></g></g>
           <ellipse id="waxDyePool" cx="199" cy="227" rx="17" ry="2.6" fill="none"/>
-          <path id="waxStream" d="M199 149V231" stroke="#ffd898" stroke-width="3"/>
+          <path id="waxStream" d="M199 149V231" stroke="var(--molten-wax)" stroke-width="3"/>
           <g id="waxTap" stroke-linejoin="round">
             <!-- The flange fastens the horizontal pipe to the tank wall. -->
             <ellipse cx="258" cy="117" rx="5" ry="14" fill="url(#tapBrass)" stroke="#f4dfaf" stroke-width="1.4"/>
@@ -465,7 +462,6 @@ body.wax-screen{background:#0f172a;min-height:0}
           <span>د.ك</span>
         </div>
         <output class="wax-status" id="waxPourStatus" aria-live="off"></output>
-        <div class="wax-total"><small>تكلفة اللون <span id="waxDyeCost">٠٫٠٠٠</span> د.ك</small><strong>الشمع واللون <span id="waxMixCost">٠٫٠٠٠</span> د.ك</strong></div>
         <label class="wax-reading wax-price wax-cup-reading">السعر<input aria-label="السعر — الكوب" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input id="waxCupWeight" aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
       </div>
@@ -474,24 +470,11 @@ body.wax-screen{background:#0f172a;min-height:0}
         <form method="dialog">
           <h3 id="waxDyeHeading">لون الشمعة</h3>
           <label>لون الحرفي<select id="waxDyeSelect"></select></label>
-          <p id="waxDyeDetails"></p>
-          <p id="waxDyeRateNote"></p>
-          <div id="waxDyeRange" hidden>
-            <label for="waxDyePercent">نسبة اللون من وزن الشمع المصبوب</label>
-            <input type="range" id="waxDyePercent" dir="ltr" disabled>
-            <output id="waxDyeReading" for="waxDyePercent"></output>
-          </div>
-          <label id="waxDyeAmountLabel" for="waxDyeAmount"></label>
-          <input id="waxDyeAmount" type="text" inputmode="decimal" autocomplete="off">
-          <div id="waxDyePackFields" hidden>
-            <label for="waxDyePackWeight">وزن عبوتك بالغرام لحساب التكلفة</label>
-            <input id="waxDyePackWeight" type="text" inputmode="decimal" autocomplete="off">
-          </div>
-          <p id="waxDyeEstimate"></p>
+          <p class="dye-preview"><span id="waxDyeSwatch" aria-hidden="true"></span><span id="waxDyeDetails"></span></p>
           <a id="waxDyeLink" target="_blank" rel="noopener">صفحة اللون في الحرفي</a>
           <div class="dye-dialog-actions">
             <button class="btn btn-success" value="apply">اختيار</button>
-            <button class="btn" type="button" id="waxDyeClear">تصفير لون الكلاس</button>
+            <button class="btn" type="button" id="waxDyeClear">إرجاع لون الشمع الطبيعي</button>
             <button class="btn" type="button" id="waxDyeCancel">إغلاق</button>
           </div>
         </form>
@@ -975,98 +958,79 @@ function setupWaxPour(){
   const cup = document.getElementById('waxCupLevel');
   const stream = document.getElementById('waxStream');
 
-  // Alherafy retail packages checked 2026-11-14. Size 0 means the seller
-  // gives no weight; use the measured package weight for costing.
+  // Retail package prices and visual swatches from Alherafy product photos, 2026-11-14.
   const dyeCatalog = [
-    {"name":"ملوّن 10 مل - أزرق سماوي","unit":"مل","size":10,"price":0.3,"color":"#68b9e2","slug":"ملوّن-10-مل-أزرق-سماوي-1"},
-    {"name":"ملوّن بنفسجي 10 مل","unit":"مل","size":10,"price":0.3,"color":"#895ac5","slug":"ملوّن-بنفسجي-10-مل-1"},
-    {"name":"ملوّن بنفسجي 10 مل","unit":"مل","size":10,"price":0.3,"color":"#9256ba","slug":"ملوّن-بنفسجي-10-مل-2"},
-    {"name":"ملوّن 10 مل - أحمر زاهٍ","unit":"مل","size":10,"price":0.3,"color":"#ea4241","slug":"ملوّن-10-مل-أحمر-زاهٍ"},
-    {"name":"ملوّن 10 مل - لون القهوة","unit":"مل","size":10,"price":0.3,"color":"#674638","slug":"ملوّن-10-مل-لون-القهوة"},
-    {"name":"ملوّن أحمر 10 مل","unit":"مل","size":10,"price":0.3,"color":"#c33342","slug":"ملوّن-أحمر-10-مل-1"},
-    {"name":"ملوّن بني 10 مل","unit":"مل","size":10,"price":0.3,"color":"#946248","slug":"ملوّن-بني-10-مل"},
-    {"name":"ملوّن 10 مل - بنفسجي داكن","unit":"مل","size":10,"price":0.3,"color":"#573876","slug":"ملوّن-10-مل-بنفسجي-داكن"},
-    {"name":"ملوّن 10 مل - أخضر زيتوني","unit":"مل","size":10,"price":0.3,"color":"#818341","slug":"ملوّن-10-مل-أخضر-زيتوني"},
-    {"name":"فتات شمعية 1 جرام من اللون الأحمر الوردي","unit":"غ","size":1,"price":0.25,"color":"#c44865","slug":"فتات-شمعية-1-جرام-من-اللون-الأحمر-الوردي"},
-    {"name":"فتات شمعية 1 جرام بنفسجي","unit":"غ","size":1,"price":0.25,"color":"#9252b4","slug":"فتات-شمعية-1-جرام-بنفسجي"},
-    {"name":"فتات شمعية 1 جرام أصفر","unit":"غ","size":1,"price":0.25,"color":"#f3cc49","slug":"فتات-شمعية-1-جرام-أصفر"},
-    {"name":"فتات شمعية 1 جرام برتقالي","unit":"غ","size":1,"price":0.25,"color":"#f49342","slug":"فتات-شمعية-1-جرام-برتقالي"},
-    {"name":"فتات شمعية 1 جرام أزرق سماوي","unit":"غ","size":1,"price":0.25,"color":"#68b9e2","slug":"فتات-شمعية-1-جرام-أزرق-سماوي"},
-    {"name":"فتات شمعية 1 جرام من اللون الأخضر لعيد الميلاد","unit":"غ","size":1,"price":0.25,"color":"#37734e","slug":"فتات-شمعية-1-جرام-من-اللون-الأخضر-لعيد-الميلاد"},
-    {"name":"فتات شمعية 1 جرام أزرق أرجواني","unit":"غ","size":1,"price":0.25,"color":"#665dad","slug":"فتات-شمعية-1-جرام-أزرق-أرجواني"},
-    {"name":"فتات شمعية 1 جرام أرجواني","unit":"غ","size":1,"price":0.25,"color":"#ab4f9b","slug":"فتات-شمعية-1-جرام-أرجواني"},
-    {"name":"قطع شمعية 5 جرام : الياقوت","unit":"غ","size":5,"price":0.25,"color":"#98616b","slug":"قطع-شمعية-5-جرام-:-الياقوت"},
-    {"name":"قطع شمعية 5 جرام : أصفر ذهبي","unit":"غ","size":5,"price":0.25,"color":"#e6b54a","slug":"قطع-شمعية-5-جرام-:-أصفر-ذهبي"},
-    {"name":"قطع شمعية 5 جرام : لون أخضر","unit":"غ","size":5,"price":0.25,"color":"#438453","slug":"قطع-شمعية-5-جرام-:-لون-أخضر"},
-    {"name":"قطع شمعية 5 جرام : زرق رمادي","unit":"غ","size":5,"price":0.25,"color":"#7193a6","slug":"قطع-شمعية-5-جرام-:-زرق-رمادي"},
-    {"name":"لون سائل 10 مل أزرق","unit":"مل","size":10,"price":0.3,"color":"#377fc6","slug":"لون-سائل-10-مل-أزرق"},
-    {"name":"صبغة شمع سائلة 10 مل / رمادي بنفسجي","unit":"مل","size":10,"price":0.3,"color":"#88819b","slug":"-رمادي-بنفسجي"},
-    {"name":"صبغة شمع سائل : الأصفر الذهبي الفاقع ١٠ مل","unit":"مل","size":10,"price":0.3,"color":"#f1c13c","slug":"صبغة-شمع-سائل-:-الأصفر-الذهبي-الفاقع-١٠-مل"},
-    {"name":"صبغة شمع سائل : أحمر فاقع ١٠ مل","unit":"مل","size":10,"price":0.3,"color":"#ee424b","slug":"صبغة-شمع-سائل-:-أحمر-فاقع-١٠-مل"},
-    {"name":"لون شمعي : احمر","unit":"غ","size":0,"price":0.35,"color":"#c74442","slug":"لون-شمعي-:-احمر"},
-    {"name":"لون شمعي أصفر ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#eac544","slug":"لون-شمعي-أصفر-١٠-جرام"},
-    {"name":"لون شمعي بنفسجي ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#8759a5","slug":"لون-شمعي-بنفسجي-١٠-جرام-1"},
-    {"name":"لون شمعي ازرق ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#477bb9","slug":"لون-شمعي-ازرق-١٠-جرام"},
-    {"name":"لون شمعي أحمر ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#c64448","slug":"لون-شمعي-أحمر-١٠-جرام-1"},
-    {"name":"لون شمعي أصفر فلورسنت ١٠ جرام","unit":"غ","size":10,"price":0.6,"color":"#e4f93c","slug":"لون-شمعي-أصفر-فلورسنت-١٠-جرام"},
-    {"name":"لون شمعي بنفسجي ١٠ جرام","unit":"غ","size":10,"price":0.6,"color":"#8653a8","slug":"لون-شمعي-بنفسجي-١٠-جرام"},
-    {"name":"لون شمعي أسود","unit":"غ","size":0,"price":0.35,"color":"#30343b","slug":"لون-شمعي-أسود"},
-    {"name":"لون شمعي أخضر","unit":"غ","size":0,"price":0.35,"color":"#4d9564","slug":"لون-شمعي-أخضر"},
-    {"name":"لون شمعي أزرق","unit":"غ","size":0,"price":0.35,"color":"#4b80bf","slug":"لون-شمعي-أزرق"},
-    {"name":"لون شمعي بنفسجي","unit":"غ","size":0,"price":0.35,"color":"#8c59ae","slug":"لون-شمعي-بنفسجي"},
-    {"name":"لون شمعي أصفر","unit":"غ","size":0,"price":0.35,"color":"#e7c34f","slug":"لون-شمعي-أصفر"},
-    {"name":"لون شمعي بني","unit":"غ","size":0,"price":0.35,"color":"#886248","slug":"لون-شمعي-بني"},
-    {"name":"لون شمعي برتقالي","unit":"غ","size":0,"price":0.35,"color":"#e6903f","slug":"لون-شمعي-برتقالي"},
-    {"name":"لون شمعي وردي","unit":"غ","size":0,"price":0.35,"color":"#dc809f","slug":"لون-شمعي-وردي"},
-    {"name":"فتات شمعية 1 جرام وردي","unit":"غ","size":1,"price":0.25,"color":"#dd88ac","slug":"فتات-شمعية-1-جرام-وردي"}
+    {"name":"ملوّن 10 مل - أزرق سماوي","unit":"مل","size":10,"price":0.3,"color":"#267EB9","slug":"ملوّن-10-مل-أزرق-سماوي-1"},
+    {"name":"ملوّن بنفسجي 10 مل","unit":"مل","size":10,"price":0.3,"color":"#5F2374","slug":"ملوّن-بنفسجي-10-مل-1"},
+    {"name":"ملوّن بنفسجي 10 مل","unit":"مل","size":10,"price":0.3,"color":"#8463A8","slug":"ملوّن-بنفسجي-10-مل-2"},
+    {"name":"ملوّن 10 مل - أحمر زاهٍ","unit":"مل","size":10,"price":0.3,"color":"#B95B72","slug":"ملوّن-10-مل-أحمر-زاهٍ"},
+    {"name":"ملوّن 10 مل - لون القهوة","unit":"مل","size":10,"price":0.3,"color":"#865E5F","slug":"ملوّن-10-مل-لون-القهوة"},
+    {"name":"ملوّن أحمر 10 مل","unit":"مل","size":10,"price":0.3,"color":"#B5494D","slug":"ملوّن-أحمر-10-مل-1"},
+    {"name":"ملوّن بني 10 مل","unit":"مل","size":10,"price":0.3,"color":"#8B6D59","slug":"ملوّن-بني-10-مل"},
+    {"name":"ملوّن 10 مل - بنفسجي داكن","unit":"مل","size":10,"price":0.3,"color":"#53244C","slug":"ملوّن-10-مل-بنفسجي-داكن"},
+    {"name":"ملوّن 10 مل - أخضر زيتوني","unit":"مل","size":10,"price":0.3,"color":"#C0B748","slug":"ملوّن-10-مل-أخضر-زيتوني"},
+    {"name":"فتات شمعية 1 جرام من اللون الأحمر الوردي","unit":"غ","size":1,"price":0.25,"color":"#1B1920","slug":"فتات-شمعية-1-جرام-من-اللون-الأحمر-الوردي"},
+    {"name":"فتات شمعية 1 جرام بنفسجي","unit":"غ","size":1,"price":0.25,"color":"#373A5D","slug":"فتات-شمعية-1-جرام-بنفسجي"},
+    {"name":"فتات شمعية 1 جرام أصفر","unit":"غ","size":1,"price":0.25,"color":"#FEDB25","slug":"فتات-شمعية-1-جرام-أصفر"},
+    {"name":"فتات شمعية 1 جرام برتقالي","unit":"غ","size":1,"price":0.25,"color":"#592218","slug":"فتات-شمعية-1-جرام-برتقالي"},
+    {"name":"فتات شمعية 1 جرام أزرق سماوي","unit":"غ","size":1,"price":0.25,"color":"#121829","slug":"فتات-شمعية-1-جرام-أزرق-سماوي"},
+    {"name":"فتات شمعية 1 جرام من اللون الأخضر لعيد الميلاد","unit":"غ","size":1,"price":0.25,"color":"#91986E","slug":"فتات-شمعية-1-جرام-من-اللون-الأخضر-لعيد-الميلاد"},
+    {"name":"فتات شمعية 1 جرام أزرق أرجواني","unit":"غ","size":1,"price":0.25,"color":"#131722","slug":"فتات-شمعية-1-جرام-أزرق-أرجواني"},
+    {"name":"فتات شمعية 1 جرام أرجواني","unit":"غ","size":1,"price":0.25,"color":"#22252E","slug":"فتات-شمعية-1-جرام-أرجواني"},
+    {"name":"قطع شمعية 5 جرام : الياقوت","unit":"غ","size":5,"price":0.25,"color":"#626EB2","slug":"قطع-شمعية-5-جرام-:-الياقوت"},
+    {"name":"قطع شمعية 5 جرام : أصفر ذهبي","unit":"غ","size":5,"price":0.25,"color":"#E9BF70","slug":"قطع-شمعية-5-جرام-:-أصفر-ذهبي"},
+    {"name":"قطع شمعية 5 جرام : لون أخضر","unit":"غ","size":5,"price":0.25,"color":"#759976","slug":"قطع-شمعية-5-جرام-:-لون-أخضر"},
+    {"name":"قطع شمعية 5 جرام : زرق رمادي","unit":"غ","size":5,"price":0.25,"color":"#8394B8","slug":"قطع-شمعية-5-جرام-:-زرق-رمادي"},
+    {"name":"لون سائل 10 مل أزرق","unit":"مل","size":10,"price":0.3,"color":"#45588E","slug":"لون-سائل-10-مل-أزرق"},
+    {"name":"صبغة شمع سائلة 10 مل / رمادي بنفسجي","unit":"مل","size":10,"price":0.3,"color":"#434A6E","slug":"-رمادي-بنفسجي"},
+    {"name":"صبغة شمع سائل : الأصفر الذهبي الفاقع ١٠ مل","unit":"مل","size":10,"price":0.3,"color":"#D67653","slug":"صبغة-شمع-سائل-:-الأصفر-الذهبي-الفاقع-١٠-مل"},
+    {"name":"صبغة شمع سائل : أحمر فاقع ١٠ مل","unit":"مل","size":10,"price":0.3,"color":"#D95968","slug":"صبغة-شمع-سائل-:-أحمر-فاقع-١٠-مل"},
+    {"name":"لون شمعي : احمر","unit":"غ","size":0,"price":0.35,"color":"#47443E","slug":"لون-شمعي-:-احمر"},
+    {"name":"لون شمعي أصفر ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#E8C401","slug":"لون-شمعي-أصفر-١٠-جرام"},
+    {"name":"لون شمعي بنفسجي ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#49225B","slug":"لون-شمعي-بنفسجي-١٠-جرام-1"},
+    {"name":"لون شمعي ازرق ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#015B8E","slug":"لون-شمعي-ازرق-١٠-جرام"},
+    {"name":"لون شمعي أحمر ١٠ جرام","unit":"غ","size":10,"price":0.45,"color":"#D2343A","slug":"لون-شمعي-أحمر-١٠-جرام-1"},
+    {"name":"لون شمعي أصفر فلورسنت ١٠ جرام","unit":"غ","size":10,"price":0.6,"color":"#F69E2A","slug":"لون-شمعي-أصفر-فلورسنت-١٠-جرام"},
+    {"name":"لون شمعي بنفسجي ١٠ جرام","unit":"غ","size":10,"price":0.6,"color":"#505557","slug":"لون-شمعي-بنفسجي-١٠-جرام"},
+    {"name":"لون شمعي أسود","unit":"غ","size":0,"price":0.35,"color":"#4D4F44","slug":"لون-شمعي-أسود"},
+    {"name":"لون شمعي أخضر","unit":"غ","size":0,"price":0.35,"color":"#4C533F","slug":"لون-شمعي-أخضر"},
+    {"name":"لون شمعي أزرق","unit":"غ","size":0,"price":0.35,"color":"#535959","slug":"لون-شمعي-أزرق"},
+    {"name":"لون شمعي بنفسجي","unit":"غ","size":0,"price":0.35,"color":"#5C5E5A","slug":"لون-شمعي-بنفسجي"},
+    {"name":"لون شمعي أصفر","unit":"غ","size":0,"price":0.35,"color":"#C47314","slug":"لون-شمعي-أصفر"},
+    {"name":"لون شمعي بني","unit":"غ","size":0,"price":0.35,"color":"#434436","slug":"لون-شمعي-بني"},
+    {"name":"لون شمعي برتقالي","unit":"غ","size":0,"price":0.35,"color":"#97493F","slug":"لون-شمعي-برتقالي"},
+    {"name":"لون شمعي وردي","unit":"غ","size":0,"price":0.35,"color":"#62605D","slug":"لون-شمعي-وردي"},
+    {"name":"فتات شمعية 1 جرام وردي","unit":"غ","size":1,"price":0.25,"color":"#3F1C35","slug":"فتات-شمعية-1-جرام-وردي"}
   ];
   const byId = id => document.getElementById(id);
   const dyeDialog = byId('waxDyeDialog');
   const dyeSelect = byId('waxDyeSelect');
-  const dyeAmount = byId('waxDyeAmount');
   const dyeTap = byId('waxDyeTap');
   const dyeSurface = cup.querySelector('.wax-wave');
-  const dyeCost = byId('waxDyeCost');
-  const mixCost = byId('waxMixCost');
-  let waxCost = 0;
-  let usedDyeCost = 0;
+  const dyePool = byId('waxDyePool');
   let chosenDye = dyeCatalog[0];
-  let dose = 0;
-  let dispensed = 0;
-  let dyeFrame = null;
-  let lastTint = '';
-  function showCosts(){
-    cost.textContent = costFormat.format(waxCost);
-    dyeCost.textContent = costFormat.format(usedDyeCost);
-    mixCost.textContent = costFormat.format(waxCost + usedDyeCost);
-  }
-  const packText = p => (p.size ? p.size + ' ' + p.unit + ' · ' : '') + costFormat.format(p.price) + ' د.ك';
-  const percentInput = byId('waxDyePercent');
-  const packWeight = byId('waxDyePackWeight');
-  let selectedPackSize = chosenDye.size;
-  let selectedPercent = null;
-  const portionCost = (p,amount,size) => amount / size * p.price;
-  // Set waxMassPercent {min,max,step} only after verifying the supplier's
-  // mass-based instructions for this SKU. Liquid conversion also needs g/ml.
-  const verifiedRange = p => p.waxMassPercent && (p.unit === 'غ' || p.gramsPerMl > 0) ? p.waxMassPercent : null;
-  function measuredValue(field){
-    const raw = field.value.trim().replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632)
-      .replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/[٫،,]/g,'.');
-    return /^(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw) ? Number(raw) : NaN;
-  }
-  const amountFormat = new Intl.NumberFormat('ar-KW-u-nu-arab',{maximumFractionDigits:3});
-  function amountValue(){
-    const p = dyeCatalog[Number(dyeSelect.value)];
-    if(!verifiedRange(p)) return measuredValue(dyeAmount);
-    const waxGrams = waxCost / waxKwdPerGram;
-    return waxGrams * percentInput.valueAsNumber / 100 / (p.unit === 'غ' ? 1 : p.gramsPerMl);
-  }
+  let cupTint = '';
+  let hasWax = false;
+  let dripTimer;
   function stopDye(){
-    if(dyeFrame !== null) cancelAnimationFrame(dyeFrame);
-    dyeFrame = null;
+    clearTimeout(dripTimer);
     diagram.classList.remove('dye-running');
     dyeTap.setAttribute('aria-pressed','false');
   }
+  function tintCup(color){
+    cupTint = color;
+    dyeSurface.style.fill = color;
+    dyeSurface.style.stroke = color;
+    dyePool.style.fill = hasWax ? 'none' : (color || 'none');
+  }
+  function addColor(){
+    stopDye();
+    diagram.classList.add('dye-running');
+    dyeTap.setAttribute('aria-pressed','true');
+    tintCup(chosenDye.color);
+    dripTimer = setTimeout(stopDye,650);
+  }
+  const packText = p => (p.size ? p.size + ' ' + p.unit + ' · ' : '') + costFormat.format(p.price) + ' د.ك';
   function showChoice(){
     diagram.style.setProperty('--wax-dye',chosenDye.color);
     byId('waxDyeName').textContent = chosenDye.name.replace(/ملوّن |10 مل - | 10 مل/g,'').trim();
@@ -1084,41 +1048,11 @@ function setupWaxPour(){
     const suffix = dyeCatalog.some((other,j)=>j<index && other.name===item.name && other.price===item.price) ? ' (٢)' : '';
     groups.get(label).append(new Option(item.name+suffix+' · '+costFormat.format(item.price)+' د.ك',index));
   });
-  function showEstimate(){
-    const p = dyeCatalog[Number(dyeSelect.value)];
-    const amount = amountValue();
-    const size = p.size || measuredValue(packWeight);
-    const valid = Number.isFinite(amount) && amount > 0 && Number.isFinite(size) && size > 0;
-    if(verifiedRange(p)){
-      byId('waxDyeReading').textContent = amountFormat.format(percentInput.valueAsNumber)+'٪ · '+amountFormat.format(amount)+' '+p.unit;
-    }
-    byId('waxDyeEstimate').textContent = valid ? 'تكلفة الكمية '+costFormat.format(portionCost(p,amount,size))+' د.ك' : '';
-    return valid;
-  }
   function showDraft(){
     const p = dyeCatalog[Number(dyeSelect.value)];
+    byId('waxDyeSwatch').style.backgroundColor = p.color;
     byId('waxDyeDetails').textContent = 'سعر العبوة '+packText(p);
     byId('waxDyeLink').href = 'https://alherafy.com/ar/products/'+encodeURIComponent(p.slug);
-    const range = verifiedRange(p);
-    byId('waxDyeRange').hidden = !range;
-    percentInput.disabled = !range;
-    dyeAmount.hidden = !!range;
-    dyeAmount.disabled = !!range;
-    byId('waxDyeAmountLabel').hidden = !!range;
-    byId('waxDyeAmountLabel').textContent = 'الكمية المقاسة فعليًا ('+p.unit+')';
-    byId('waxDyePackFields').hidden = !!p.size;
-    byId('waxDyeRateNote').textContent = range ? 'نطاق الاستخدام المنشور من الحرفي' : 'لا تتوفر نسبة خلط موثّقة من الحرفي لهذا اللون.';
-    if(range){
-      percentInput.min = range.min;
-      percentInput.max = range.max;
-      percentInput.step = range.step || 'any';
-      percentInput.value = p === chosenDye && selectedPercent !== null ? selectedPercent : range.min;
-    }
-    dyeAmount.value = p === chosenDye && dose ? dose : '';
-    packWeight.value = p === chosenDye && selectedPackSize ? selectedPackSize : '';
-    dyeAmount.setCustomValidity('');
-    packWeight.setCustomValidity('');
-    showEstimate();
   }
   function openDyePicker(){
     stopDye();
@@ -1128,63 +1062,20 @@ function setupWaxPour(){
   }
   diagram.querySelectorAll('[data-dye-picker]').forEach(el=>el.addEventListener('click',openDyePicker));
   dyeSelect.addEventListener('change',showDraft);
-  percentInput.addEventListener('input',showEstimate);
-  packWeight.addEventListener('input',()=>{packWeight.setCustomValidity('');showEstimate();});
-  dyeAmount.addEventListener('input',()=>{dyeAmount.setCustomValidity('');showEstimate();});
   dyeDialog.querySelector('form').addEventListener('submit',event=>{
     event.preventDefault();
-    if(!showEstimate()){
-      const p = dyeCatalog[Number(dyeSelect.value)];
-      const field = !p.size && !(measuredValue(packWeight)>0) ? packWeight : dyeAmount;
-      if(verifiedRange(p) && field === dyeAmount){byId('waxDyeEstimate').textContent='أضف الشمع إلى الكلاس أولًا.';return;}
-      field.setCustomValidity('أدخل كمية موجبة بالوحدة الموضّحة.');
-      field.reportValidity();
-      return;
-    }
-    const selected = dyeCatalog[Number(dyeSelect.value)];
-    const nextDose = amountValue();
-    if(selected !== chosenDye || nextDose !== dose) dispensed = 0;
-    selectedPackSize = selected.size || measuredValue(packWeight);
-    selectedPercent = verifiedRange(selected) ? percentInput.valueAsNumber : null;
-    chosenDye = selected;
-    dose = nextDose;
+    chosenDye = dyeCatalog[Number(dyeSelect.value)];
     showChoice();
     dyeDialog.close();
+    addColor();
   });
   byId('waxDyeCancel').addEventListener('click',()=>dyeDialog.close());
   byId('waxDyeClear').addEventListener('click',()=>{
     stopDye();
-    dispensed = 0;
-    usedDyeCost = 0;
-    lastTint = '';
-    dyeSurface.style.fill = '';
-    byId('waxDyePool').style.fill = 'none';
-    showCosts();
+    tintCup('');
     dyeDialog.close();
   });
-  dyeTap.addEventListener('click',()=>{
-    if(dyeFrame !== null){stopDye();return;}
-    if(!dose){openDyePicker();return;}
-    if(dispensed>=dose) dispensed=0;
-    const prior = dispensed;
-    const priorCost = usedDyeCost;
-    const started = performance.now();
-    diagram.classList.add('dye-running');
-    dyeTap.setAttribute('aria-pressed','true');
-    function drip(now){
-      dispensed = Math.min(dose,prior + dose*Math.max(0,now-started)/1500);
-      usedDyeCost = priorCost + portionCost(chosenDye,dispensed-prior,selectedPackSize);
-      if(dispensed>prior){
-        lastTint = chosenDye.color;
-        dyeSurface.style.fill = lastTint;
-        byId('waxDyePool').style.fill = waxCost ? 'none' : lastTint;
-      }
-      showCosts();
-      if(dispensed<dose) dyeFrame=requestAnimationFrame(drip);
-      else stopDye();
-    }
-    dyeFrame=requestAnimationFrame(drip);
-  });
+  dyeTap.addEventListener('click',addColor);
   showChoice();
   let frame = null;
   let target = 0;
@@ -1230,9 +1121,9 @@ function setupWaxPour(){
       stream.setAttribute('d','M199 149V'+Math.min(229,surface));
       const pouredGrams = progress === 1 ? grams : Math.floor(grams*progress*10)/10;
       status.textContent = (progress === 1 ? raw : pouredGrams.toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
-      waxCost = pouredGrams * waxKwdPerGram;
-      byId('waxDyePool').style.fill = waxCost ? 'none' : (lastTint || 'none');
-      showCosts();
+      hasWax = pouredGrams > 0;
+      dyePool.style.fill = hasWax ? 'none' : (cupTint || 'none');
+      cost.textContent = costFormat.format(pouredGrams * waxKwdPerGram);
       if(progress < 1) frame = requestAnimationFrame(draw);
       else setOpen(false);
     }
