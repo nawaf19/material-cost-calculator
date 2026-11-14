@@ -251,6 +251,19 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
 .wax-reading input:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
 .wax-price{left:1%}.wax-weight{right:1%}
 .wax-cup-reading{top:49%}.wax-tool-reading{top:68%}.wax-bowl-reading{top:89%}
+
+.wax-tap-control{position:absolute;left:30%;top:19%;width:26%;height:12%;min-height:44px;background:transparent;border:0;color:#ffe2a3;font:inherit;cursor:pointer;display:flex;align-items:center;justify-content:flex-start;direction:ltr}
+.wax-tap-control span{background:#243345;border:1px solid #ad8752;border-radius:14px;padding:2px 8px;font-size:clamp(10px,2.8vw,14px);line-height:1.6}
+.wax-tap-control:focus-visible{outline:2px solid #ffd89d;border-radius:8px}
+.wax-status{position:absolute;left:25%;top:35%;font-size:clamp(10px,2.6vw,14px);color:#ffe2a3;direction:rtl}
+.wax-wave{animation:waxRipple 2.8s linear infinite}
+#waxValve{transform-origin:208px 98px;transition:transform .22s}
+.wax-pouring #waxValve{transform:rotate(-55deg)}
+#waxStream{opacity:0}
+.wax-pouring #waxStream{opacity:1}
+.wax-pouring #waxFlowPath{opacity:0}
+@keyframes waxRipple{to{transform:translateX(24px)}}
+@media(prefers-reduced-motion:reduce){.wax-wave{animation:none}#waxValve{transition:none}}
 </style>
 </head>
 <body>
@@ -337,24 +350,28 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
         <svg viewBox="0 0 400 424" role="img" aria-labelledby="waxDiagramTitle" fill="none" stroke-linejoin="round" stroke-linecap="round">
           <title id="waxDiagramTitle">خزان الشمع وحنفيته فوق كوب الاستقبال، ثم أداة مائلة ووعاء دائري</title>
           <defs>
+            <clipPath id="waxTankGlass"><path d="M224 42H292V121Q257 131 224 121Z"/></clipPath>
+            <clipPath id="waxCupGlass"><path d="M175 188H223L219 227Q199 233 179 227Z"/></clipPath>
             <linearGradient id="waxMetal"><stop stop-color="#425369"/><stop offset=".32" stop-color="#a7b7c9"/><stop offset=".55" stop-color="#63768a"/><stop offset="1" stop-color="#354457"/></linearGradient>
             <linearGradient id="waxAmber" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#ffe2a3"/><stop offset="1" stop-color="#c78a43"/></linearGradient>
           </defs>
           <rect id="waxBlankBox" x="328" y="13" width="49" height="49" rx="5" stroke="#718499" fill="#162234"/>
           <g id="waxTank" stroke="#b9c9d7" stroke-width="2">
             <path d="M222 37Q257 26 294 37V123Q257 134 222 123Z" fill="#23384b"/>
-            <path d="M224 82Q233 76 244 82T267 82T292 81V121Q257 131 224 121Z" fill="url(#waxAmber)" stroke="#f9d69b"/>
+            <g clip-path="url(#waxTankGlass)"><g id="waxTankLevel" transform="translate(0 82)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffdf9a"/></g></g>
             <ellipse cx="258" cy="37" rx="36" ry="7" fill="url(#waxMetal)"/>
           </g>
           <g id="waxTap" stroke="#cad6df" stroke-width="2">
             <path d="M222 105H205Q195 105 195 116V124H203V117Q203 113 208 113H222Z" fill="url(#waxMetal)"/>
-            <path d="M208 105V98M201 97H215" stroke-width="4"/>
+            <path id="waxValve" d="M208 105V98M201 97H215" stroke-width="4"/>
           </g>
           <path id="waxFlowPath" d="M199 132V177" stroke="#e5b66f" stroke-width="2" stroke-dasharray="3 7"/>
           <g id="waxCup" stroke="#adbdcc" stroke-width="2">
-            <path d="M174 187L178 228Q199 235 220 228L224 187" fill="url(#waxMetal)"/>
+            <path d="M174 187L178 228Q199 235 220 228L224 187" fill="#223547"/>
             <ellipse cx="199" cy="187" rx="25" ry="6" fill="#293b4c"/>
           </g>
+          <g clip-path="url(#waxCupGlass)"><g id="waxCupLevel" transform="translate(0 237)"><path class="wax-wave" d="M140 0q6 -3 12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0t12 0v100H140Z" fill="url(#waxAmber)" stroke="#ffe3a7"/></g></g>
+          <path id="waxStream" d="M199 124V231" stroke="#ffd898" stroke-width="3"/>
           <g id="waxTool" transform="rotate(26 144 278)" stroke="#e2c299" stroke-width="2">
             <path d="M105 265Q118 259 132 264L147 271H164V285H146L129 291Q114 294 105 285Q98 277 105 265Z" fill="#866644"/>
             <path d="M164 273H177V283H164Z" fill="#c4ab89"/>
@@ -366,8 +383,10 @@ input[type=range].qty-range.hardener::-moz-range-thumb { background: linear-grad
             <ellipse cx="200" cy="342" rx="37" ry="10" fill="#243445" stroke="#889cac"/>
           </g>
         </svg>
+        <button type="button" class="wax-tap-control" id="waxPourButton" aria-label="فتح الحنفية وصب الوزن المحدد"><span>صبّ</span></button>
+        <output class="wax-status" id="waxPourStatus" aria-live="off"></output>
         <label class="wax-reading wax-price wax-cup-reading">السعر<input aria-label="السعر — الكوب" inputmode="decimal" autocomplete="off"></label>
-        <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
+        <label class="wax-reading wax-weight wax-cup-reading">الوزن (غرام)<input id="waxCupWeight" aria-label="الوزن (غرام) — الكوب" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-price wax-tool-reading">السعر<input aria-label="السعر — الأداة المائلة" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-weight wax-tool-reading">الوزن (غرام)<input aria-label="الوزن (غرام) — الأداة المائلة" inputmode="decimal" autocomplete="off"></label>
         <label class="wax-reading wax-price wax-bowl-reading">السعر<input aria-label="السعر — الوعاء" inputmode="decimal" autocomplete="off"></label>
@@ -833,6 +852,55 @@ function confirmDelete(){
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.show').forEach(m=>m.classList.remove('show'));});
+
+function setupWaxPour(){
+  const diagram = document.getElementById('waxDiagram');
+  const button = document.getElementById('waxPourButton');
+  const input = document.getElementById('waxCupWeight');
+  const status = document.getElementById('waxPourStatus');
+  const tank = document.getElementById('waxTankLevel');
+  const cup = document.getElementById('waxCupLevel');
+  const stream = document.getElementById('waxStream');
+  let frame = null;
+  function finish(){
+    diagram.classList.remove('wax-pouring');
+    button.disabled = false;
+    input.readOnly = false;
+    button.firstElementChild.textContent = 'صبّ';
+    frame = null;
+  }
+  input.addEventListener('input', () => input.setCustomValidity(''));
+  button.addEventListener('click', () => {
+    if(frame !== null) return;
+    const raw = input.value.trim().replace(/[٠-٩]/g, c => c.charCodeAt(0)-1632)
+      .replace(/[۰-۹]/g, c => c.charCodeAt(0)-1776).replace(/[٫,،]/g,'.');
+    const grams = Number(raw);
+    if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw) || !Number.isFinite(grams) || grams <= 0){
+      input.setCustomValidity('أدخل وزن الشمع بالغرام أكبر من صفر.');
+      input.focus();
+      input.reportValidity();
+      return;
+    }
+    const duration = Math.min(6000, 1200 + 240 * Math.sqrt(grams));
+    const start = performance.now();
+    button.disabled = true;
+    input.readOnly = true;
+    button.firstElementChild.textContent = 'يصبّ';
+    diagram.classList.add('wax-pouring');
+    function draw(now){
+      const progress = Math.min(1, Math.max(0,(now-start)/duration));
+      const surface = 237 - 42 * progress;
+      tank.setAttribute('transform','translate(0 '+(82+20*progress)+')');
+      cup.setAttribute('transform','translate(0 '+surface+')');
+      stream.setAttribute('d','M199 124V'+Math.min(229,surface));
+      status.textContent = (progress === 1 ? raw : (Math.floor(grams*progress*10)/10).toLocaleString('ar',{maximumFractionDigits:1})) + ' غ';
+      if(progress < 1) frame = requestAnimationFrame(draw);
+      else finish();
+    }
+    draw(start);
+  });
+}
+setupWaxPour();
 
 refreshCalcSections();
 refreshPkgChecklist();
